@@ -36,8 +36,8 @@ git push -u origin main
 
 5. Click **"Advanced"** and add Environment Variables:
    - `FLASK_SECRET_KEY` = `starlink-drc-secret-2026`
-   - `TELEGRAM_BOT_TOKEN` = `8772088407:AAEqYV7OOKEq_-BrqnttZDYTvQw8UJcMCnk`
-   - `TELEGRAM_CHAT_ID` = `8296688054`
+   - `TELEGRAM_BOT_TOKEN` = `8772088407:AAE2EKy8ti-VBwmT8Ie_yXflXsZ2cpefak0`
+   - `TELEGRAM_CHAT_ID` = `6624177719`
 
 6. Click **"Create Web Service"**
 
@@ -55,7 +55,7 @@ git push -u origin main
 Replace `YOUR_RENDER_URL` with your actual URL, then run in terminal:
 ```
 bash
-curl -X POST https://api.telegram.org/bot8772088407:AAEqYV7OOKEq_-BrqnttZDYTvQw8UJcMCnk/setWebhook -d url=https://starlink-drc.onrender.com/telegram/webhook
+curl -X POST https://api.telegram.org/bot8772088407:AAE2EKy8ti-VBwmT8Ie_yXflXsZ2cpefak0/setWebhook -d url=https://starlink-drc.onrender.com/telegram/webhook
 ```
 
 ---

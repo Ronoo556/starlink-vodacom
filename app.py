@@ -23,8 +23,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # TELEGRAM CONFIG
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8772088407:AAE2EKy8ti-VBwmT8Ie_yXflXsZ2cpefak0')
+TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '6624177719')
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}'
 
 # MODELS - Using 'customers' table to match existing database
