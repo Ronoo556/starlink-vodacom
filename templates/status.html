@@ -4,9 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>État du réseau - Starlink RDC</title>
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -22,8 +20,6 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    
-    /* Navbar */
     .navbar-dark { background: #000 !important; }
     .brand-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.05em; }
     .brand-divider { color: rgba(255,255,255,0.25); margin: 0 8px; }
@@ -31,11 +27,7 @@
     .nav-link { color: rgba(255,255,255,0.7) !important; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
     .nav-link:hover, .nav-link.active { color: #fff !important; }
     .nav-link svg { width: 16px; height: 16px; }
-    
-    /* Page */
     .page-content { padding: 24px; max-width: 800px; margin: 0 auto; }
-    
-    /* Banner */
     .plan-banner {
       display: flex; align-items: center; justify-content: center; gap: 12px;
       background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
@@ -46,8 +38,6 @@
     }
     .plan-banner:hover { opacity: 0.9; }
     .plan-banner svg { width: 20px; height: 20px; }
-    
-    /* Service Card */
     .service-card {
       background: #0f172a;
       border-radius: 14px; padding: 32px;
@@ -62,8 +52,6 @@
       background: radial-gradient(circle at 40% 40%, var(--blue-light), var(--blue-dark));
       border-radius: 50%; opacity: 0.7; flex-shrink: 0;
     }
-    
-    /* Metrics */
     .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
     .metric-card {
       background: var(--card-bg); border-radius: 14px; padding: 24px;
@@ -78,8 +66,6 @@
     .metric-icon-up { color: var(--green); width: 18px; height: 18px; }
     .metric-value { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--text); line-height: 1; margin: 8px 0 4px; }
     .metric-unit { font-size: 0.85rem; color: var(--text-muted); }
-    
-    /* Usage Card */
     .usage-card {
       background: var(--card-bg); border-radius: 14px; padding: 24px;
       border: 1px solid var(--border); margin-top: 16px;
@@ -95,8 +81,6 @@
       transition: width 0.6s ease;
     }
     .usage-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
-    
-    /* Diagnostic Button */
     .diag-btn {
       background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
       display: flex; align-items: center; justify-content: center; gap: 10px;
@@ -106,8 +90,6 @@
     }
     .diag-btn svg { width: 20px; height: 20px; color: var(--blue); }
     .diag-btn:hover { background: #f8fafc; }
-    
-    /* Toast */
     .toast-notification {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
       background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 99px;
@@ -115,7 +97,6 @@
       opacity: 0; transition: all 0.3s ease; white-space: nowrap;
     }
     .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    
     @media(max-width: 640px) {
       .brand-sub, .brand-divider { display: none; }
       .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -128,7 +109,6 @@
 </head>
 <body>
 
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-black">
   <div class="container">
     <a class="navbar-brand d-flex align-items-center" href="/">
@@ -142,25 +122,25 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <li class="nav-item">
-href="/status"
+          <a class="nav-link active" href="/status">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.05 1a23 23 0 0 1 21.9 21"/><path d="M1.05 7a17 17 0 0 1 15.95 15"/><circle cx="3" cy="19" r="2"/></svg>
             Statut
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="index.html">
+          <a class="nav-link" href="/">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
             Forfaits
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="orders.html">
+          <a class="nav-link" href="/orders">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
             Commandes
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="settings.html">
+          <a class="nav-link" href="/settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
             Paramètres
           </a>
@@ -170,16 +150,12 @@ href="/status"
   </div>
 </nav>
 
-<!-- PAGE -->
 <div class="page-content">
-
-  <!-- Choose Plan Banner -->
-  <a href="index.html" class="plan-banner">
+  <a href="/" class="plan-banner">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
     CHOISIR VOTRE FORFAIT
   </a>
 
-  <!-- Service Card -->
   <div class="service-card mt-4">
     <div>
       <div class="service-tag">INFORMATIONS DU SERVICE</div>
@@ -189,7 +165,6 @@ href="/status"
     <div class="service-orb"></div>
   </div>
 
-  <!-- Metrics -->
   <div class="metrics-grid">
     <div class="metric-card">
       <div class="metric-label">
@@ -219,7 +194,6 @@ href="/status"
     </div>
   </div>
 
-  <!-- Data Usage -->
   <div class="usage-card">
     <div class="usage-header">
       <div class="usage-title">
@@ -237,17 +211,14 @@ href="/status"
     </div>
   </div>
 
-  <!-- Diagnostic -->
   <button class="diag-btn" onclick="runDiagnostic()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
     Lancer le test de diagnostic
   </button>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="toast-notification"></div>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
@@ -263,7 +234,6 @@ function showToast(message, duration = 3000) {
 
 function runDiagnostic() {
   showToast('Exécution du test de diagnostic…');
-  // Simulate getting new values
   setTimeout(() => {
     fetch('/api/network-status')
       .then(res => res.json())
@@ -285,7 +255,6 @@ function runDiagnostic() {
   }, 1500);
 }
 
-// Load network status on page load
 document.addEventListener('DOMContentLoaded', function() {
   fetch('/api/network-status')
     .then(res => res.json())
