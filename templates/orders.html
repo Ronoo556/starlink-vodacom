@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historique des commandes - Starlink RDC</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-dark: #1d4ed8;
+      --green: #16a34a;
+      --yellow: #ca8a04;
+      --red: #dc2626;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    /* Navbar */
+    .navbar-dark { background: #000 !important; }
+    .brand-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.05em; }
+    .brand-divider { color: rgba(255,255,255,0.25); margin: 0 8px; }
+    .brand-sub { color: rgba(255,255,255,0.55); font-size: 0.85rem; }
+    .nav-link { color: rgba(255,255,255,0.7) !important; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .nav-link:hover, .nav-link.active { color: #fff !important; }
+    .nav-link svg { width: 16px; height: 16px; }
+    
+    /* Page */
+    .page-content { padding: 32px 24px; max-width: 1200px; margin: 0 auto; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+    .page-title { font-family: 'Syne', sans-serif; font-size: 1.75rem; font-weight: 800; color: var(--text); }
+    .total-badge { background: #f1f5f9; border: 1px solid var(--border); border-radius: 99px; padding: 8px 16px; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); }
+    
+    /* Filters */
+    .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn { padding: 8px 16px; border: 1px solid var(--border); background: var(--card-bg); border-radius: 99px; font-size: 0.85rem; font-weight: 500; cursor: pointer; color: var(--text-muted); transition: all 0.2s; }
+    .filter-btn:hover, .filter-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
+    
+    /* Table */
+    .table-wrap { background: var(--card-bg); border-radius: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); overflow: hidden; overflow-x: auto; }
+    .orders-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+    .orders-table thead tr { background: #f8fafc; border-bottom: 1px solid var(--border); }
+    .orders-table th { padding: 14px 16px; text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em; color: var(--text-muted); text-transform: uppercase; white-space: nowrap; }
+    .orders-table td { padding: 16px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .orders-table tr:last-child td { border-bottom: none; }
+    .orders-table tr:hover td { background: #fafbff; }
+    
+    .col-order { font-weight: 700; color: var(--text); white-space: nowrap; }
+    .col-amount { font-weight: 600; white-space: nowrap; }
+    
+    /* Status Badges */
+    .status-badge { display: inline-block; padding: 4px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; white-space: nowrap; }
+    .status-pending { background: #fef9c3; color: #854d0e; }
+    .status-pin-verified { background: #dbeafe; color: #1d4ed8; }
+    .status-completed { background: #dcfce7; color: #166534; }
+    .status-failed { background: #fee2e2; color: #991b1b; }
+    
+    /* Airtel Details */
+    .airtel-detail { display: block; font-size: 0.8rem; color: var(--text-muted); line-height: 1.7; }
+    .no-details { font-size: 0.8rem; color: #cbd5e1; font-style: italic; }
+    
+    /* Action Button */
+    .btn-edit { padding: 6px 14px; background: var(--blue); color: #fff; border: none; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+    .btn-edit:hover { background: var(--blue-dark); }
+    
+    /* Pagination */
+    .pagination { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 24px; }
+    .page-btn { display: inline-block; padding: 8px 14px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: border-color 0.2s, background 0.2s; }
+    .page-btn:hover { border-color: var(--blue); background: #eff6ff; }
+    .page-info { font-size: 0.9rem; color: var(--text-muted); }
+    
+    /* Modal */
+    .modal-header { border-bottom: 1px solid var(--border); }
+    .modal-title { font-family: 'Syne', sans-serif; font-weight: 700; }
+    .form-label { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+    .btn-primary { background: var(--blue); border-color: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dark); border-color: var(--blue-dark); }
+    
+    /* Toast */
+    .toast-notification {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 99px;
+      font-size: 0.9rem; font-weight: 500; z-index: 9999;
+      opacity: 0; transition: all 0.3s ease; white-space: nowrap;
+    }
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    @media(max-width: 768px) {
+      .page-content { padding: 20px 16px; }
+      .page-title { font-size: 1.4rem; }
+      .brand-sub, .brand-divider { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <span class="brand-logo">STARLINK</span>
+      <span class="brand-divider">|</span>
+      <span class="brand-sub">RDC Reseller</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="status.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.05 1a23 23 0 0 1 21.9 21"/><path d="M1.05 7a17 17 0 0 1 15.95 15"/><circle cx="3" cy="19" r="2"/></svg>
+            Statut
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Forfaits
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link active" href="orders.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Commandes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="settings.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Paramètres
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page-content">
+  <div class="page-header">
+    <h1 class="page-title">Historique des commandes Starlink</h1>
+    <span class="total-badge" id="total-badge">Total: 0</span>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters">
+    <button class="filter-btn active" onclick="filterOrders('all')">Tous</button>
+    <button class="filter-btn" onclick="filterOrders('Pending')">En attente</button>
+    <button class="filter-btn" onclick="filterOrders('Pin_Verified')">PIN vérifié</button>
+    <button class="filter-btn" onclick="filterOrders('Completed')">Terminé</button>
+    <button class="filter-btn" onclick="filterOrders('Failed')">Échoué</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrap">
+    <table class="orders-table">
+      <thead>
+        <tr>
+          <th>N° COMMANDE</th>
+          <th>CLIENT</th>
+          <th>FORFAIT</th>
+          <th>MONTANT</th>
+          <th>STATUT</th>
+          <th>DATE</th>
+          <th>DÉTAILS AIRTEL</th>
+          <th>ACTION</th>
+        </tr>
+      </thead>
+      <tbody id="orders-body">
+        <!-- Loaded by JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Mettre à jour la commande <span id="m-ref"></span></h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="m-id"/>
+        
+        <div class="mb-3">
+          <label class="form-label">Statut</label>
+          <select class="form-select" id="m-status">
+            <option value="Pending">En attente</option>
+            <option value="Pin_Verified">PIN vérifié</option>
+            <option value="Completed">Terminé</option>
+            <option value="Failed">Échoué</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Numéro Airtel</label>
+          <input class="form-control" id="m-airtel-num" type="text" placeholder="+243…"/>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">PIN</label>
+          <input class="form-control" id="m-pin" type="text" placeholder="ex. 2525"/>
+        </div>
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label">OTP 1</label>
+            <input class="form-control" id="m-otp1" type="text" placeholder="—"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label">OTP 2</label>
+            <input class="form-control" id="m-otp2" type="text" placeholder="—"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label">OTP 3</label>
+            <input class="form-control" id="m-otp3" type="text" placeholder="—"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label">OTP 4</label>
+            <input class="form-control" id="m-otp4" type="text" placeholder="—"/>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary w-100" onclick="saveOrder()">Enregistrer les modifications</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast-notification"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let allOrders = [];
+let currentPage = 1;
+let currentFilter = 'all';
+let editingId = null;
+
+// Toast
+let toastTimer;
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// Status helpers
+function badgeClass(status) {
+  return {
+    'Pending': 'status-pending',
+    'Pin_Verified': 'status-pin-verified',
+    'Completed': 'status-completed',
+    'Failed': 'status-failed'
+  }[status] || 'status-pending';
+}
+
+function badgeLabel(status) {
+  return {
+    'Pending': 'En attente',
+    'Pin_Verified': 'PIN vérifié',
+    'Completed': 'Terminé',
+    'Failed': 'Échoué'
+  }[status] || status;
+}
+
+function airtelHTML(airtel) {
+  if (!airtel || !airtel.num) return '<span class="no-details">Aucun détail</span>';
+  let html = `<span class="airtel-detail">Num: ${airtel.num}</span>`;
+  if (airtel.pin) html += `<span class="airtel-detail">PIN: ${airtel.pin}</span>`;
+  if (airtel.otp1) html += `<span class="airtel-detail">OTP 1: ${airtel.otp1}</span>`;
+  if (airtel.otp2) html += `<span class="airtel-detail">OTP 2: ${airtel.otp2}</span>`;
+  if (airtel.otp3) html += `<span class="airtel-detail">OTP 3: ${airtel.otp3}</span>`;
+  if (airtel.otp4) html += `<span class="airtel-detail">OTP 4: ${airtel.otp4}</span>`;
+  return html;
+}
+
+// Render orders
+function renderOrders() {
+  const tbody = document.getElementById('orders-body');
+  const filtered = currentFilter === 'all' 
+    ? allOrders 
+    : allOrders.filter(o => o.status === currentFilter);
+  
+  const start = (currentPage - 1) * 10;
+  const pageOrders = filtered.slice(start, start + 10);
+  
+  tbody.innerHTML = pageOrders.map(o => `
+    <tr>
+      <td class="col-order">${o.order_ref}</td>
+      <td>${o.customer_phone || '—'}</td>
+      <td>${o.plan_name}</td>
+      <td class="col-amount">CDF ${parseFloat(o.amount).toLocaleString('fr-CD')},00</td>
+      <td><span class="status-badge ${badgeClass(o.status)}">${badgeLabel(o.status)}</span></td>
+      <td>${o.created_at}</td>
+      <td>${airtelHTML({num: o.airtel_number, pin: o.airtel_pin, otp1: o.otp1, otp2: o.otp2, otp3: o.otp3, otp4: o.otp4})}</td>
+      <td><button class="btn-edit" onclick="openModal(${o.id})">Edit</button></td>
+    </tr>
+  `).join('');
+  
+  document.getElementById('total-badge').textContent = `Total: ${filtered.length}`;
+  renderPagination(filtered.length);
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / 10);
+  const pag = document.getElementById('pagination');
+  if (pages <= 1) {
+    pag.innerHTML = '';
+    return;
+  }
+  let html = '';
+  for (let i = 1; i <= pages; i++) {
+    html += `<a href="#" class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</a>`;
+  }
+  pag.innerHTML = html;
+}
+
+function goToPage(page) {
+  currentPage = page;
+  renderOrders();
+}
+
+function filterOrders(status) {
+  currentFilter = status;
+  currentPage = 1;
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.toLowerCase().replace(' ', '') === status.toLowerCase().replace('_', ''));
+  });
+  renderOrders();
+}
+
+// Modal
+function openModal(id) {
+  const o = allOrders.find(x => x.id === id);
+  if (!o) return;
+  editingId = id;
+  document.getElementById('m-ref').textContent = o.order_ref;
+  document.getElementById('m-status').value = o.status;
+  document.getElementById('m-airtel-num').value = o.airtel_number || '';
+  document.getElementById('m-pin').value = o.airtel_pin || '';
+  document.getElementById('m-otp1').value = o.otp1 || '';
+  document.getElementById('m-otp2').value = o.otp2 || '';
+  document.getElementById('m-otp3').value = o.otp3 || '';
+  document.getElementById('m-otp4').value = o.otp4 || '';
+  const modal = new bootstrap.Modal(document.getElementById('editModal'));
+  modal.show();
+}
+
+function saveOrder() {
+  const data = {
+    status: document.getElementById('m-status').value,
+    airtel_number: document.getElementById('m-airtel-num').value,
+    airtel_pin: document.getElementById('m-pin').value,
+    otp1: document.getElementById('m-otp1').value,
+    otp2: document.getElementById('m-otp2').value,
+    otp3: document.getElementById('m-otp3').value,
+    otp4: document.getElementById('m-otp4').value,
+  };
+  
+  fetch(`/api/orders/${editingId}`, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(res => res.json())
+  .then(() => {
+    bootstrap.Modal.getInstance(document.getElementById('editModal')).hide();
+    showToast('✅ Commande mise à jour avec succès');
+    loadOrders();
+  })
+  .catch(err => {
+    showToast('❌ Erreur lors de la mise à jour de la commande');
+    console.error(err);
+  });
+}
+
+// Load orders
+function loadOrders() {
+  fetch('/api/orders')
+    .then(res => res.json())
+    .then(data => {
+      allOrders = data.orders || [];
+      renderOrders();
+    })
+    .catch(err => console.error('Error loading orders:', err));
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', loadOrders);
+</script>
+</body>
+</html>

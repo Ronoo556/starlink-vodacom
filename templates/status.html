@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>État du réseau - Starlink RDC</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-light: #3b82f6;
+      --blue-dark: #1d4ed8;
+      --green: #16a34a;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --bg: #f5f7fa;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    
+    /* Navbar */
+    .navbar-dark { background: #000 !important; }
+    .brand-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; color: #fff; letter-spacing: 0.05em; }
+    .brand-divider { color: rgba(255,255,255,0.25); margin: 0 8px; }
+    .brand-sub { color: rgba(255,255,255,0.55); font-size: 0.85rem; }
+    .nav-link { color: rgba(255,255,255,0.7) !important; font-weight: 500; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; }
+    .nav-link:hover, .nav-link.active { color: #fff !important; }
+    .nav-link svg { width: 16px; height: 16px; }
+    
+    /* Page */
+    .page-content { padding: 24px; max-width: 800px; margin: 0 auto; }
+    
+    /* Banner */
+    .plan-banner {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-light) 100%);
+      border-radius: 14px; padding: 20px;
+      color: #fff; font-weight: 600; font-size: 1rem;
+      text-decoration: none; cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .plan-banner:hover { opacity: 0.9; }
+    .plan-banner svg { width: 20px; height: 20px; }
+    
+    /* Service Card */
+    .service-card {
+      background: #0f172a;
+      border-radius: 14px; padding: 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      min-height: 140px; position: relative; overflow: hidden;
+    }
+    .service-tag { color: var(--blue-light); font-size: 0.75rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px; }
+    .service-name { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 8px; }
+    .service-desc { color: rgba(255,255,255,0.5); font-size: 0.95rem; }
+    .service-orb {
+      width: 100px; height: 100px;
+      background: radial-gradient(circle at 40% 40%, var(--blue-light), var(--blue-dark));
+      border-radius: 50%; opacity: 0.7; flex-shrink: 0;
+    }
+    
+    /* Metrics */
+    .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+    .metric-card {
+      background: var(--card-bg); border-radius: 14px; padding: 24px;
+      border: 1px solid var(--border);
+    }
+    .metric-label {
+      font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em;
+      color: var(--text-muted); text-transform: uppercase;
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+    }
+    .metric-icon-down { color: var(--blue); width: 18px; height: 18px; }
+    .metric-icon-up { color: var(--green); width: 18px; height: 18px; }
+    .metric-value { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 700; color: var(--text); line-height: 1; margin: 8px 0 4px; }
+    .metric-unit { font-size: 0.85rem; color: var(--text-muted); }
+    
+    /* Usage Card */
+    .usage-card {
+      background: var(--card-bg); border-radius: 14px; padding: 24px;
+      border: 1px solid var(--border); margin-top: 16px;
+    }
+    .usage-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .usage-title { display: flex; align-items: center; gap: 8px; color: var(--blue); font-weight: 600; font-size: 1rem; }
+    .usage-title svg { width: 20px; height: 20px; }
+    .usage-pct { font-weight: 600; color: var(--text-muted); }
+    .usage-bar { background: #f0f2f5; border-radius: 99px; height: 10px; overflow: hidden; margin-bottom: 8px; }
+    .usage-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--blue), var(--blue-light));
+      transition: width 0.6s ease;
+    }
+    .usage-labels { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); }
+    
+    /* Diagnostic Button */
+    .diag-btn {
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 18px; font-family: 'DM Sans', sans-serif; font-size: 1rem;
+      font-weight: 500; color: var(--text); cursor: pointer;
+      transition: background 0.2s; width: 100%; margin-top: 16px;
+    }
+    .diag-btn svg { width: 20px; height: 20px; color: var(--blue); }
+    .diag-btn:hover { background: #f8fafc; }
+    
+    /* Toast */
+    .toast-notification {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+      background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 99px;
+      font-size: 0.9rem; font-weight: 500; z-index: 9999;
+      opacity: 0; transition: all 0.3s ease; white-space: nowrap;
+    }
+    .toast-notification.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    
+    @media(max-width: 640px) {
+      .brand-sub, .brand-divider { display: none; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+      .service-card { padding: 24px; }
+      .service-name { font-size: 1.5rem; }
+      .service-orb { width: 70px; height: 70px; }
+      .page-content { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-black">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center" href="index.html">
+      <span class="brand-logo">STARLINK</span>
+      <span class="brand-divider">|</span>
+      <span class="brand-sub">RDC Reseller</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link active" href="status.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1.05 1a23 23 0 0 1 21.9 21"/><path d="M1.05 7a17 17 0 0 1 15.95 15"/><circle cx="3" cy="19" r="2"/></svg>
+            Statut
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Forfaits
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="orders.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Commandes
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="settings.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            Paramètres
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page-content">
+
+  <!-- Choose Plan Banner -->
+  <a href="index.html" class="plan-banner">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    CHOISIR VOTRE FORFAIT
+  </a>
+
+  <!-- Service Card -->
+  <div class="service-card mt-4">
+    <div>
+      <div class="service-tag">INFORMATIONS DU SERVICE</div>
+      <div class="service-name">Starlink RDC</div>
+      <div class="service-desc">Sélectionnez un forfait pour activer l'internet haut débit par satellite.</div>
+    </div>
+    <div class="service-orb"></div>
+  </div>
+
+  <!-- Metrics -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">
+        TÉLÉCHARGEMENT
+        <svg class="metric-icon-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
+      </div>
+      <div class="metric-value" id="download">107.71</div>
+      <div class="metric-unit">Mbps</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">
+        ENVOI
+        <svg class="metric-icon-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+      </div>
+      <div class="metric-value" id="upload">36.37</div>
+      <div class="metric-unit">Mbps</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">PING</div>
+      <div class="metric-value" id="ping">49</div>
+      <div class="metric-unit">ms</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">GIGUE</div>
+      <div class="metric-value" id="jitter">9</div>
+      <div class="metric-unit">ms</div>
+    </div>
+  </div>
+
+  <!-- Data Usage -->
+  <div class="usage-card">
+    <div class="usage-header">
+      <div class="usage-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        Utilisation des données
+      </div>
+      <span class="usage-pct" id="usage-pct">25%</span>
+    </div>
+    <div class="usage-bar">
+      <div class="usage-fill" id="usage-fill" style="width:25%"></div>
+    </div>
+    <div class="usage-labels">
+      <span id="data-used">24.7 GB</span>
+      <span id="data-total">100 GB</span>
+    </div>
+  </div>
+
+  <!-- Diagnostic -->
+  <button class="diag-btn" onclick="runDiagnostic()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Lancer le test de diagnostic
+  </button>
+</div>
+
+<!-- TOAST -->
+<div id="toast" class="toast-notification"></div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+let toastTimer;
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
+}
+
+function runDiagnostic() {
+  showToast('Exécution du test de diagnostic…');
+  // Simulate getting new values
+  setTimeout(() => {
+    fetch('/api/network-status')
+      .then(res => res.json())
+      .then(data => {
+        if(data.download) document.getElementById('download').textContent = data.download.toFixed(2);
+        if(data.upload) document.getElementById('upload').textContent = data.upload.toFixed(2);
+        if(data.ping) document.getElementById('ping').textContent = data.ping.toFixed(0);
+        if(data.jitter) document.getElementById('jitter').textContent = data.jitter.toFixed(0);
+        if(data.data_used !== undefined) {
+          document.getElementById('data-used').textContent = data.data_used.toFixed(1) + ' GB';
+          const pct = Math.round((data.data_used / data.data_total) * 100);
+          document.getElementById('usage-pct').textContent = pct + '%';
+          document.getElementById('usage-fill').style.width = pct + '%';
+          document.getElementById('data-total').textContent = data.data_total.toFixed(0) + ' GB';
+        }
+        showToast('✅ Diagnostic terminé !');
+      })
+      .catch(() => showToast('❌ Échec de la récupération du statut réseau'));
+  }, 1500);
+}
+
+// Load network status on page load
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/api/network-status')
+    .then(res => res.json())
+    .then(data => {
+      if(data.download) document.getElementById('download').textContent = data.download.toFixed(2);
+      if(data.upload) document.getElementById('upload').textContent = data.upload.toFixed(2);
+      if(data.ping) document.getElementById('ping').textContent = data.ping.toFixed(0);
+      if(data.jitter) document.getElementById('jitter').textContent = data.jitter.toFixed(0);
+      if(data.data_used !== undefined) {
+        document.getElementById('data-used').textContent = data.data_used.toFixed(1) + ' GB';
+        const pct = Math.round((data.data_used / data.data_total) * 100);
+        document.getElementById('usage-pct').textContent = pct + '%';
+        document.getElementById('usage-fill').style.width = pct + '%';
+        document.getElementById('data-total').textContent = data.data_total.toFixed(0) + ' GB';
+      }
+    });
+});
+</script>
+</body>
+</html>
