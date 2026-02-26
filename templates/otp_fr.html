@@ -106,9 +106,8 @@ function verifyOTP() {
       setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 1500);
     } else {
       // Invalid OTP - allow retry up to MAX_ATTEMPTS times with SAME code
-      const remainingAttempts = MAX_ATTEMPTS - otpAttempts;
-      if (remainingAttempts > 0) {
-        showToast(`Code invalide. Veuillez réessayer. (${remainingAttempts} tentative(s) restante(s))`);
+      if (otpAttempts < MAX_ATTEMPTS) {
+        showToast('Code invalide. Veuillez réessayer.');
         // Clear OTP boxes for retry
         otpBoxes.forEach(box => box.value = '');
         otpBoxes[0].focus();
