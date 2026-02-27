@@ -151,25 +151,36 @@
       border-radius: 2px;
       overflow: hidden;
       position: relative;
-      background: #0047AB;
+      background: #007FFF;
     }
     .flag::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(to top right, 
+          transparent 43%, 
+          #FCD116 43%, 
+          #FCD116 46%, 
+          #E00025 46%, 
+          #E00025 57%, 
+          #FCD116 57%, 
+          #FCD116 60%, 
+          transparent 60%
+        );
+    }
+    .flag::after {
       content: '★';
       position: absolute;
       color: #FCD116;
-      font-size: 8px;
-      top: 1px;
-      left: 2px;
-      transform: rotate(-45deg);
-    }
-    .flag::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background: #E00025;
+      font-size: 5px;
+      top: 2px;
+      left: 3px;
+      z-index: 2;
+      text-shadow: 0 0 1px #000;
     }
     .form-control {
       border: none;

