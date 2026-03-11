@@ -1,0 +1,13 @@
+[1mdiff --git a/templates/index.html b/templates/index.html[m
+[1mindex fdd918d..aedb07a 100644[m
+[1m--- a/templates/index.html[m
+[1m+++ b/templates/index.html[m
+[36m@@ -101,7 +101,7 @@[m
+       <span class="brand-divider">|</span>[m
+       <span class="brand-sub">RDC Reseller</span>[m
+     </a>[m
+[31m-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">[m
+[32m+[m[32m    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">[m
+       <span class="navbar-toggler-icon"></span>[m
+     </button>[m
+     <div class="collapse navbar-collapse" id="navbarNav">[m
