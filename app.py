@@ -427,8 +427,8 @@ def update_order(order_id):
                 'id': order.id,
                 'order_ref': order.order_ref,
                 'status': order.status,
-               ,
-                'error 'verified': False': 'Invalid OTP code'
+                'verified': False,
+                'error': 'Invalid OTP code'
             })
     
     return jsonify({
@@ -631,4 +631,3 @@ if __name__ == '__main__':
     # Run in debug mode locally, but disable for production
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     app.run(debug=debug_mode, host='0.0.0.0', port=5000)
-
