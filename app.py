@@ -650,6 +650,7 @@ def seed_data():
     db.session.commit()
 
 
+
 def migrate_database():
     """Add missing columns to the database"""
     try:
@@ -677,11 +678,13 @@ def migrate_database():
         print(f'Migration error: {e}')
 
 
+# Run migration and seed data when app starts
+with app.app_context():
+    migrate_database()
+    db.create_all()
+    seed_data()
+
 if __name__ == '__main__':
-    with app.app_context():
-        migrate_database()
-        db.create_all()
-        seed_data()
     # Run in debug mode locally, but disable for production
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     app.run(debug=debug_mode, host='0.0.0.0', port=5000)
