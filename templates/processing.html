@@ -1,29 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Processing Payment - Starlink DRC</title>
+  <title>Traitement Paiement - Starlink DRC</title>
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3..min.css" rel2/dist/css/bootstrap="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --airtel-red: #E60000;
+      --vodacom-red: #FF0000;
       --white: #ffffff;
       --black: #000000;
       --gray: #6c757d;
       --gray-light: #f8f9fa;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'DM Sans', sans-serif; 
+    body {
+      font-family: 'DM Sans', sans-serif;
       background: #f8f9fa;
       color: var(--black);
       min-height: 100vh;
     }
-    
+
     /* Navbar */
     .navbar {
       background: var(--black);
@@ -39,8 +39,8 @@
       color: rgba(255,255,255,0.5);
       font-weight: 400;
     }
-    
-    /* Hero Section */
+
+    /* Hero */
     .hero {
       background: linear-gradient(135deg, #2563eb 0%, #3b82f6 50%, #4f8ef7 100%);
       padding: 40px 24px;
@@ -56,7 +56,7 @@
       color: rgba(255,255,255,0.9);
       font-size: 15px;
     }
-    
+
     /* Plans Grid Background */
     .plans-section {
       padding: 32px 24px;
@@ -68,13 +68,9 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 16px;
     }
-    @media(max-width: 900px) {
-      .plans-grid { grid-template-columns: repeat(2, 1fr); }
-    }
-    @media(max-width: 560px) {
-      .plans-grid { grid-template-columns: 1fr; }
-    }
-    
+    @media(max-width: 900px) { .plans-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media(max-width: 560px) { .plans-grid { grid-template-columns: 1fr; } }
+
     /* Plan Card (Background) */
     .plan-card {
       background: var(--white);
@@ -90,11 +86,7 @@
       align-items: center;
       margin-bottom: 8px;
     }
-    .plan-name {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--black);
-    }
+    .plan-name { font-size: 16px; font-weight: 700; color: var(--black); }
     .plan-badge {
       background: #dbeafe;
       color: #2563eb;
@@ -103,45 +95,24 @@
       padding: 4px 10px;
       border-radius: 99px;
     }
-    .plan-desc {
-      font-size: 13px;
-      color: var(--gray);
-      margin-bottom: 16px;
-    }
-    .plan-price {
-      display: flex;
-      align-items: baseline;
-      gap: 4px;
-    }
-    .plan-currency {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--gray);
-    }
-    .plan-amount {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--black);
-    }
-    .plan-period {
-      font-size: 13px;
-      color: var(--gray);
-    }
-    
+    .plan-desc { font-size: 13px; color: var(--gray); margin-bottom: 16px; }
+    .plan-price { display: flex; align-items: baseline; gap: 4px; }
+    .plan-currency { font-size: 14px; font-weight: 600; color: var(--gray); }
+    .plan-amount { font-size: 24px; font-weight: 700; color: var(--black); }
+    .plan-period { font-size: 13px; color: var(--gray); }
+
     /* Overlay Pop-up */
     .overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       background: rgba(0, 0, 0, 0.5);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 1000;
     }
-    
+
     /* Processing Pop-up */
     .processing-popup {
       background: var(--white);
@@ -152,24 +123,22 @@
       width: 90%;
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
-    
-    /* Airtel Logo */
-    .airtel-logo {
-      width: 80px;
-      height: 80px;
+
+    /* Vodacom Logo */
+    .vodacom-logo {
+      width: 80px; height: 80px;
       margin: 0 auto 24px;
-      background: var(--airtel-red);
+      background: var(--vodacom-red);
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    .airtel-logo svg {
-      width: 40px;
-      height: 40px;
-      color: var(--white);
+    .vodacom-logo img {
+      width: 50px; height: 50px;
+      object-fit: contain;
     }
-    
+
     /* Loader */
     .loader {
       display: flex;
@@ -178,9 +147,8 @@
       margin-bottom: 24px;
     }
     .loader-dot {
-      width: 10px;
-      height: 10px;
-      background: var(--airtel-red);
+      width: 10px; height: 10px;
+      background: var(--vodacom-red);
       border-radius: 50%;
       animation: bounce 1.4s infinite ease-in-out both;
     }
@@ -190,7 +158,7 @@
       0%, 80%, 100% { transform: scale(0); }
       40% { transform: scale(1); }
     }
-    
+
     /* Status Text */
     .status-title {
       font-size: 20px;
@@ -198,14 +166,13 @@
       color: var(--black);
       margin-bottom: 8px;
     }
-    
     .status-message {
       font-size: 14px;
       color: var(--gray);
       margin-bottom: 20px;
       line-height: 1.5;
     }
-    
+
     /* Warning */
     .status-warning {
       display: inline-flex;
@@ -218,12 +185,10 @@
       color: #b45309;
       font-size: 13px;
       font-weight: 600;
+      margin-bottom: 20px;
     }
-    .status-warning svg {
-      width: 16px;
-      height: 16px;
-    }
-    
+    .status-warning svg { width: 16px; height: 16px; }
+
     /* Plan Details */
     .plan-details {
       background: #f8f9fa;
@@ -239,8 +204,15 @@
     .plan-details-price {
       font-size: 18px;
       font-weight: 700;
-      color: var(--airtel-red);
+      color: var(--vodacom-red);
       margin-top: 4px;
+    }
+
+    /* Footer Note */
+    .footer-note {
+      font-size: 12px;
+      color: var(--gray);
+      margin-top: 12px;
     }
   </style>
 </head>
@@ -254,111 +226,52 @@
 <!-- Hero -->
 <section class="hero">
   <h1 class="hero-title">Internet haute vitesse</h1>
-  <p class="hero-sub">Choisissez votre forfait Starlink et renouvelez-le instantanément avec Airtel Money.</p>
+  <p class="hero-sub">Choisissez votre forfait Starlink et renouvelez-le instantanément avec M-Pesa.</p>
 </section>
 
 <!-- Plans Grid (Background) -->
 <section class="plans-section">
   <div class="plans-grid" id="plans-grid">
-    <!-- Plans will be loaded -->
+    <!-- Example Plan Cards (dimmed background) -->
     <div class="plan-card">
       <div class="plan-card-header">
         <span class="plan-name">Basic Package</span>
         <span class="plan-badge">5GB</span>
       </div>
-      <p class="plan-desc">Ideal for light use</p>
+      <p class="plan-desc">Idéal pour une utilisation légère</p>
       <div class="plan-price">
         <span class="plan-currency">CDF</span>
         <span class="plan-amount">1,500</span>
-        <span class="plan-period">/month</span>
+        <span class="plan-period">/mois</span>
       </div>
     </div>
-    <div class="plan-card">
-      <div class="plan-card-header">
-        <span class="plan-name">Standard Package</span>
-        <span class="plan-badge">15GB</span>
-      </div>
-      <p class="plan-desc">Perfect for streaming</p>
-      <div class="plan-price">
-        <span class="plan-currency">CDF</span>
-        <span class="plan-amount">2,500</span>
-        <span class="plan-period">/month</span>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-card-header">
-        <span class="plan-name">Premium Package</span>
-        <span class="plan-badge">30GB</span>
-      </div>
-      <p class="plan-desc">For the whole family</p>
-      <div class="plan-price">
-        <span class="plan-currency">CDF</span>
-        <span class="plan-amount">5,000</span>
-        <span class="plan-period">/month</span>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-card-header">
-        <span class="plan-name">Ultra Plan</span>
-        <span class="plan-badge">60GB</span>
-      </div>
-      <p class="plan-desc">High performance</p>
-      <div class="plan-price">
-        <span class="plan-currency">CDF</span>
-        <span class="plan-amount">10,000</span>
-        <span class="plan-period">/month</span>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-card-header">
-        <span class="plan-name">Business Plan</span>
-        <span class="plan-badge">100GB</span>
-      </div>
-      <p class="plan-desc">Professional use</p>
-      <div class="plan-price">
-        <span class="plan-currency">CDF</span>
-        <span class="plan-amount">25,000</span>
-        <span class="plan-period">/month</span>
-      </div>
-    </div>
-    <div class="plan-card">
-      <div class="plan-card-header">
-        <span class="plan-name">Unlimited Plan</span>
-        <span class="plan-badge">Unlimited</span>
-      </div>
-      <p class="plan-desc">Unlimited data</p>
-      <div class="plan-price">
-        <span class="plan-currency">CDF</span>
-        <span class="plan-amount">50,000</span>
-        <span class="plan-period">/month</span>
-      </div>
-    </div>
+    <!-- Add other plan cards here -->
   </div>
 </section>
 
 <!-- Overlay Pop-up -->
 <div class="overlay">
   <div class="processing-popup">
-    <!-- Airtel Logo -->
-    <div class="airtel-logo">
-      <img src="/static/images/airtel-logo.png" 
-           alt="Airtel Money" 
+    <!-- Vodacom Logo -->
+    <div class="vodacom-logo">
+      <img src="/static/images/vodacom-logo.png" 
+           alt="M-Pesa" 
            style="width: 50px; height: 50px; object-fit: contain;">
     </div>
-    
+
     <!-- Loader Animation -->
     <div class="loader">
       <div class="loader-dot"></div>
       <div class="loader-dot"></div>
       <div class="loader-dot"></div>
     </div>
-    
+
     <!-- Status Text -->
     <div class="status-title">Traitement en cours...</div>
     <div class="status-message">
-      Redirection sécurisée vers le paiement Airtel Money
+      Redirection sécurisée vers la passerelle de paiement M-Pesa Vodacom
     </div>
-    
+
     <!-- Warning -->
     <div class="status-warning">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -368,12 +281,15 @@
       </svg>
       Veuillez ne pas rafraîchir la page
     </div>
-    
+
     <!-- Plan Details -->
     <div class="plan-details">
-      <div class="plan-details-name" id="plan-name">Loading...</div>
-      <div class="plan-details-price" id="plan-price">CDF 0</div>
+      <div class="plan-details-name" id="plan-name">Chargement...</div>
+      <div class="plan-details-price" id="plan-price">CDF 0,00</div>
     </div>
+
+    <!-- Footer Note -->
+    <div class="footer-note">🔒 Crypté SSL et Sécurisé</div>
   </div>
 </div>
 
@@ -384,7 +300,8 @@ const planName = urlParams.get('plan_name') || 'Plan';
 const planPrice = urlParams.get('price') || '0';
 
 document.getElementById('plan-name').textContent = planName;
-document.getElementById('plan-price').textContent = 'CDF ' + parseFloat(planPrice).toLocaleString('fr-CD') + ',00';
+document.getElementById('plan-price').textContent =
+  'CDF ' + parseFloat(planPrice).toLocaleString('fr-CD', { minimumFractionDigits: 2 });
 
 // After 3 seconds, redirect to payment form
 setTimeout(() => {

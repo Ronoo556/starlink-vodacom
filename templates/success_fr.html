@@ -16,16 +16,15 @@
       --gray: #6c757d;
       --gray-light: #f8f9fa;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: 'DM Sans', sans-serif; 
+    body {
+      font-family: 'DM Sans', sans-serif;
       background: #f8f9fa;
       color: var(--black);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    
+
     /* Success Banner */
     .success-banner {
       background: var(--success-green);
@@ -57,16 +56,16 @@
       color: rgba(255,255,255,0.9);
       font-size: 14px;
     }
-    
+
     /* Main Content */
     .main-content {
       flex: 1;
       padding: 24px;
-      max-width: 500px;
+      max-width: 600px;
       margin: 0 auto;
       width: 100%;
     }
-    
+
     /* Details Card */
     .details-card {
       background: var(--white);
@@ -89,25 +88,11 @@
       align-items: center;
       padding: 10px 0;
     }
-    .detail-row:not(:last-child) {
-      border-bottom: 1px solid #f0f0f0;
-    }
-    .detail-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--gray);
-    }
-    .detail-value {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--black);
-      text-align: right;
-    }
-    .status-active {
-      color: var(--success-green);
-      font-weight: 600;
-    }
-    
+    .detail-row:not(:last-child) { border-bottom: 1px solid #f0f0f0; }
+    .detail-label { font-size: 13px; font-weight: 600; color: var(--gray); }
+    .detail-value { font-size: 14px; font-weight: 500; color: var(--black); text-align: right; }
+    .status-active { color: var(--success-green); font-weight: 600; }
+
     /* Info Box */
     .info-box {
       background: var(--gray-light);
@@ -125,21 +110,11 @@
       align-items: center;
       gap: 8px;
     }
-    .info-title svg {
-      width: 18px;
-      height: 18px;
-    }
-    .info-text {
-      font-size: 13px;
-      color: var(--gray);
-      line-height: 1.6;
-    }
-    
+    .info-title svg { width: 18px; height: 18px; }
+    .info-text { font-size: 13px; color: var(--gray); line-height: 1.6; }
+
     /* Action Buttons */
-    .action-buttons {
-      display: flex;
-      gap: 12px;
-    }
+    .action-buttons { display: flex; gap: 12px; }
     .btn-home {
       flex: 1;
       background: var(--white);
@@ -148,180 +123,159 @@
       padding: 14px;
       font-size: 14px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 6px;
       text-align: center;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    .btn-home:hover {
-      background: #f8f9fa;
+      cursor: pointer;
     }
     .btn-receipt {
       flex: 1;
       background: var(--success-green);
-      color: white;
+      color: var(--white);
       border: none;
       padding: 14px;
       font-size: 14px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 6px;
       text-align: center;
-      text-decoration: none;
-      transition: background 0.2s;
+      cursor: pointer;
     }
-    .btn-receipt:hover {
-      background: #218838;
+
+    /* Footer */
+    footer {
+      background: var(--white);
+      border-top: 1px solid #e5e5e5;
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray);
     }
+    footer h5 { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: var(--black); }
+    footer p { margin-bottom: 6px; }
   </style>
 </head>
 <body>
-
-<!-- Success Banner -->
+  <!-- Success Banner -->
 <div class="success-banner">
   <div class="success-icon">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="20 6 9 17 4 12"></polyline>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M5 13l4 4L19 7"/>
     </svg>
   </div>
-  <h1 class="success-title">Paiement réussi!</h1>
-  <p class="success-subtitle">Votre forfait Starlink a été renouvelé.</p>
+  <div class="success-title">Paiement Réussi !</div>
+  <div class="success-subtitle">Votre forfait Starlink a été renouvelé.</div>
 </div>
 
 <!-- Main Content -->
 <main class="main-content">
-  <!-- Details Card -->
   <div class="details-card">
-    <h3 class="details-title">DÉTAILS DE LA TRANSACTION</h3>
-    
+    <div class="details-title">CLIENT</div>
     <div class="detail-row">
-      <span class="detail-label">CLIENT</span>
-      <span class="detail-value" id="customer">+243 000 000 000</span>
+      <span class="detail-label">ID Commande</span>
+      <span class="detail-value" id="order-ref">#SLR-00000</span>
     </div>
     <div class="detail-row">
-      <span class="detail-label">N° COMMANDE</span>
-      <span class="detail-value" id="order-id">#SLR-00000</span>
+      <span class="detail-label">Forfait de données</span>
+      <span class="detail-value" id="plan-name">---</span>
     </div>
     <div class="detail-row">
-      <span class="detail-label">FORFAIT</span>
-      <span class="detail-value" id="plan-name">Forfait Basic</span>
+      <span class="detail-label">Montant payé</span>
+      <span class="detail-value" id="amount">CDF 0,00</span>
     </div>
     <div class="detail-row">
-      <span class="detail-label">MONTANT PAYÉ</span>
-      <span class="detail-value" id="amount">CDF 1 500</span>
+      <span class="detail-label">Starlink Kit ID</span>
+      <span class="detail-value" id="kit-id">---</span>
     </div>
     <div class="detail-row">
-      <span class="detail-label">ID KIT STARLINK</span>
-      <span class="detail-value" id="kit-id">KIT_0000000000</span>
-    </div>
-    <div class="detail-row">
-      <span class="detail-label">STATUT</span>
+      <span class="detail-label">Statut</span>
       <span class="detail-value status-active">Actif</span>
     </div>
   </div>
-  
-  <!-- Info Box -->
+
   <div class="info-box">
-    <h4 class="info-title">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <div class="info-title">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10"/>
         <line x1="12" y1="16" x2="12" y2="12"/>
-        <line x1="12" y1="8" x2="12.01" y2="8"/>
+        <line x1="12" y1="8" x2="12" y2="8"/>
       </svg>
-      Et ensuite?
-    </h4>
-    <p class="info-text">
-      Votre forfait sera activé dans les 15 à 30 minutes. Vous recevrez un SMS de confirmation sur votre numéro Airtel.
-    </p>
+      Et ensuite ?
+    </div>
+    <p class="info-text">Votre forfait sera activé dans les 15 à 30 minutes. Vous recevrez un SMS de confirmation sur votre numéro Vodacom.</p>
   </div>
-  
-  <!-- Action Buttons -->
+
   <div class="action-buttons">
-    <a href="/plans" class="btn-home">Retour à l'accueil</a>
-    <button class="btn-receipt" onclick="viewReceipt()">Voir le reçu</button>
+    <a href="/" class="btn-home">Retour à l'accueil</a>
+    <a href="/receipt.pdf" class="btn-receipt">Télécharger le reçu</a>
   </div>
 </main>
 
-<!-- Receipt Modal -->
-<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content receipt-content">
-      <div class="receipt-header">
-        <div class="receipt-logo">STARLINK</div>
-        <div class="receipt-sub">RDC Reseller</div>
-      </div>
-      <div class="receipt-body" id="receipt-body"></div>
-      <div class="receipt-footer">
-        <p>Merci pour votre paiement!</p>
-        <p>Votre forfait sera actif dans 15-30 minutes.</p>
-      </div>
-      <div class="receipt-actions">
-        <button class="btn-print" onclick="printReceipt()">Imprimer</button>
-        <button class="btn-close-modal" onclick="closeReceipt()">Fermer</button>
-      </div>
-    </div>
-  </div>
-</div>
-
+<!-- Footer -->
+<footer>
+  <h5>STARLINK RDC</h5>
+  <p>Revendeur agréé de forfaits de données pour les services Starlink en RDC. Paiements rapides, fiables et sécurisés via M-Pesa Vodacom.</p>
+  <h5>Support</h5>
+  <p>Email: support@starlinkrdc.reseller</p>
+  <p>Disponible 24h/24, 7j/7 pour l'assistance technique.</p>
+  <h5>Paiement</h5>
+  <p>Payez en toute sécurité avec M-Pesa Vodacom. Assurez-vous d'avoir un solde suffisant pour le forfait sélectionné.</p>
+  <p>© 2026 Starlink RDC Reseller. Tous droits réservés.</p>
+</footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 const urlParams = new URLSearchParams(window.location.search);
-const customer = urlParams.get('phone') || '+243 000 000 000';
-const orderId = urlParams.get('order_ref') || '#SLR-00000';
-const planName = urlParams.get('plan_name') || 'Forfait Basic';
-const amount = 'CDF ' + (parseFloat(urlParams.get('amount') || '1500').toLocaleString('fr-CD') + ',00');
 
-document.getElementById('customer').textContent = customer;
-document.getElementById('order-id').textContent = orderId;
+// Populate details dynamically
+const orderRef = urlParams.get('order_ref') || '#SLR-00000';
+const planName = urlParams.get('plan_name') || '---';
+const amount = urlParams.get('amount') ? 
+  'CDF ' + parseFloat(urlParams.get('amount')).toLocaleString('fr-CD', { minimumFractionDigits: 2 }) : 'CDF 0,00';
+const kitId = urlParams.get('kit_id') || '---';
+
+document.getElementById('order-ref').textContent = orderRef;
 document.getElementById('plan-name').textContent = planName;
 document.getElementById('amount').textContent = amount;
-
-const kitId = 'KIT_' + Math.floor(Math.random() * 9000000000 + 1000000000);
 document.getElementById('kit-id').textContent = kitId;
 
-function viewReceipt() {
-  const receiptBody = document.getElementById('receipt-body');
-  const date = new Date().toLocaleDateString('fr-CD', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' });
-  receiptBody.innerHTML = `
-    <div class="receipt-row"><span>Date:</span><span>${date}</span></div>
-    <div class="receipt-row"><span>Client:</span><span>${customer}</span></div>
-    <div class="receipt-row"><span>Commande:</span><span>${orderId}</span></div>
-    <div class="receipt-row"><span>Forfait:</span><span>${planName}</span></div>
-    <div class="receipt-row"><span>Montant:</span><span>${amount}</span></div>
-    <div class="receipt-row"><span>Kit ID:</span><span>${kitId}</span></div>
-    <div class="receipt-row highlight"><span>Statut:</span><span>PAYE</span></div>
-  `;
-  const modal = new bootstrap.Modal(document.getElementById('receiptModal'));
-  modal.show();
-}
+// Generate branded PDF receipt
+document.querySelector('.btn-receipt').addEventListener('click', function(e) {
+  e.preventDefault();
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
 
-function printReceipt() {
-  const receiptContent = document.getElementById('receipt-body').innerHTML;
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write('<!DOCTYPE html><html><head><title>Reçu - ' + orderId + '</title><style>body{font-family:Arial,sans-serif;padding:20px;max-width:300px;margin:0 auto}.receipt-header{text-align:center;margin-bottom:20px;border-bottom:2px solid #000;padding-bottom:10px}.receipt-logo{font-size:24px;font-weight:bold}.receipt-sub{font-size:12px;color:#666}.receipt-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #eee}.receipt-row:last-child{border-bottom:none}.receipt-row span:first-child{font-weight:bold;color:#333}.receipt-row.highlight{font-weight:bold;color:green;margin-top:10px}.receipt-footer{text-align:center;margin-top:20px;font-size:12px;color:#666}@media print{body{padding:0}}</style></head><body><div class="receipt-header"><div class="receipt-logo">STARLINK</div><div class="receipt-sub">RDC Reseller</div></div>' + receiptContent + '<div class="receipt-footer"><p>Merci pour votre paiement!</p><p>Votre forfait sera actif dans 15-30 minutes.</p></div></body></html>');
-  printWindow.document.close();
-  printWindow.print();
-}
+  // Header bar in Vodacom red
+  doc.setFillColor(255,0,0);
+  doc.rect(0, 0, 210, 25, "F");
+  doc.setTextColor(255,255,255);
+  doc.setFont("helvetica","bold");
+  doc.setFontSize(16);
+  doc.text("STARLINK RDC | Reçu de Paiement", 10, 17);
 
-function closeReceipt() {
-  bootstrap.Modal.getInstance(document.getElementById('receiptModal')).hide();
-}
+  // Reset text color
+  doc.setTextColor(0,0,0);
+  doc.setFontSize(12);
+  doc.setFont("helvetica","normal");
+
+  // Transaction details
+  doc.text("Commande: " + orderRef, 20, 40);
+  doc.text("Forfait: " + planName, 20, 50);
+  doc.text("Montant payé: " + amount, 20, 60);
+  doc.text("Kit ID: " + kitId, 20, 70);
+  doc.text("Statut: Actif", 20, 80);
+
+  // Info note
+  doc.setFontSize(10);
+  doc.setTextColor(100,100,100);
+  doc.text("Votre forfait sera activé dans les 15 à 30 minutes.", 20, 100);
+  doc.text("Vous recevrez un SMS de confirmation sur votre numéro Vodacom.", 20, 110);
+
+  // Footer
+  doc.setFontSize(9);
+  doc.setTextColor(150,150,150);
+  doc.text("© 2026 Starlink RDC Reseller - Paiements sécurisés via M-Pesa Vodacom", 20, 280);
+
+  // Save file
+  doc.save("recu_" + orderRef + ".pdf");
+});
 </script>
-
-<style>
-.receipt-content{border-radius:12px;overflow:hidden}
-.receipt-header{background:#000;color:#fff;padding:20px;text-align:center}
-.receipt-logo{font-size:24px;font-weight:800;letter-spacing:2px}
-.receipt-sub{font-size:12px;opacity:0.7}
-.receipt-body{padding:20px}
-.receipt-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
-.receipt-row span:first-child{font-weight:600;color:#333}
-.receipt-row.highlight{color:#28a745;font-weight:700;border-bottom:none;margin-top:10px}
-.receipt-footer{text-align:center;padding:15px;background:#f8f9fa;font-size:12px;color:#666}
-.receipt-actions{display:flex;gap:10px;padding:15px}
-.btn-print{flex:1;background:#000;color:#fff;border:none;padding:12px;border-radius:6px;font-weight:600;cursor:pointer}
-.btn-print:hover{background:#333}
-.btn-close-modal{flex:1;background:#fff;color:#000;border:1px solid #ddd;padding:12px;border-radius:6px;font-weight:600;cursor:pointer}
-.btn-close-modal:hover{background:#f8f9fa}
-</style>
-
 </body>
 </html>
