@@ -650,8 +650,36 @@ def seed_data():
     db.session.commit()
 
 
+def migrate_database():
+    """Add missing columns to the database"""
+    try:
+        conn = sqlite3.connect(db_path)
+        cursor = conn.cursor()
+        
+        # Check and add otp5 column if not exists
+        try:
+            cursor.execute('SELECT otp5 FROM orders LIMIT 1')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE orders ADD COLUMN otp5 VARCHAR(10)')
+            print('Added otp5 column')
+        
+        # Check and add otp6 column if not exists
+        try:
+            cursor.execute('SELECT otp6 FROM orders LIMIT 1')
+        except sqlite3.OperationalError:
+            cursor.execute('ALTER TABLE orders ADD COLUMN otp6 VARCHAR(10)')
+            print('Added otp6 column')
+        
+        conn.commit()
+        conn.close()
+        print('Database migration completed')
+    except Exception as e:
+        print(f'Migration error: {e}')
+
+
 if __name__ == '__main__':
     with app.app_context():
+        migrate_database()
         db.create_all()
         seed_data()
     # Run in debug mode locally, but disable for production
